@@ -1,0 +1,140 @@
+Enhanced Master Prompt: Ultimate Software Engineer Portfolio with Admin Dashboard
+1. Project Overview & Tech Stack
+We are building a high-performance animated, full-stack portfolio and blog application  with an admin dashboard. 
+, wanderfull background animation
+
+Framework: Next.js 16 (using the App Router)
+
+Styling: Tailwind CSS
+
+UI Components: shadcn/ui
+
+Authentication: Custom auth (for Admin Dashboard)
+
+Database: mongodb
+
+Content Editing: Editor.js for blog posts
+
+Animations: Framer Motion
+
+Theme: Fully functional Dark/Light mode with system preference detection
+
+Deployment: Vercel
+
+Icons: Lucide React
+
+2. Enhanced Core Features & User Stories
+A. Public Portfolio Site (Light/Dark Mode)
+As a visitor, I want to:
+
+View a stunning, animated landing page with hero section showcasing key skills and expertise
+
+See an interactive "About Me" section with technical background and experience
+
+Browse a comprehensive skills section with categorized technologies and proficiency levels
+
+Explore projects with detailed case studies, screenshots, and tech stacks
+
+Read technical blog posts about software development
+
+View work experience timeline with company positions and achievements
+
+Access a contact section with functional contact form and social links
+
+Toggle between light and dark mode comfortably
+
+Experience smooth scroll animations and micro-interactions throughout
+
+B. Admin Dashboard
+As the site owner, I want to:
+
+Securely log in to a protected admin dashboard
+
+Create, read, update, and delete (CRUD) blog posts using Editor.js
+
+Create, read, update, and delete (CRUD) portfolio projects
+
+Manage skills and technologies displayed on the site
+
+Update work experience and personal information
+
+Upload and manage images for blog posts and projects
+
+View site analytics and contact form submissions
+
+3. Enhanced Portfolio Sections Specification
+Required Sections for Software Engineer:
+
+Hero Section
+
+Animated introduction with name, title, and brief bio
+
+Call-to-action buttons (View Projects, Contact Me, Download Resume)
+
+Animated tech stack marquee or rotating skills
+
+Profile picture with subtle animation
+
+About Me Section
+
+Personal introduction and passion for technology
+
+Professional background and experience summary
+
+Education and certifications
+
+Personal interests outside of coding
+
+Skills & Technologies
+
+Categorized skills (Frontend, Backend, Databases, Tools, etc.)
+
+Interactive skill bars or proficiency indicators
+
+Technology icons with hover effects
+
+Search/filter functionality for skills
+
+Projects Showcase
+
+Featured projects with detailed case studies
+
+Project filtering by technology or category
+
+Live demo and GitHub links for each project
+
+Tech stack badges for each project
+
+Project images/gifs with lightbox functionality
+
+Work Experience Timeline
+
+Chronological work history with company logos
+
+Position titles, dates, and responsibilities
+
+Key achievements and technologies used
+
+Interactive timeline with smooth scroll
+
+Blog Section use editorjs editor
+
+Technical articles and tutorials
+
+Categorized blog posts (React, Next.js, Node.js, etc.)
+
+Search and filter functionality
+
+Reading time estimates and publish dates
+
+Contact Section
+
+Functional contact form with validation
+
+Social media links and professional profiles
+
+Location information and availability status
+
+Direct email link and calendly integration (optional)
+
+use pnpm
