@@ -22,7 +22,7 @@ async function ProjectContent({ id }: { id: string }) {
   }
 
   return (
-    <div className="container mx-auto px-6 py-12 max-w-6xl">
+    <div className="container mx-auto px-6 max-w-6xl">
       {/* Back Button */}
       <Link href="/#projects">
         <Button variant="ghost" size="sm" className="mb-8">
@@ -124,6 +124,76 @@ async function ProjectContent({ id }: { id: string }) {
               )}
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Related Projects */}
+      <div className="mt-20">
+        <h2 className="text-3xl font-semibold mb-8">Related Projects</h2>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {projects
+            .filter((p) => {
+              // Exclude current project
+              if (p.id === project.id) return false;
+              
+              // Include projects from same category or with overlapping technologies
+              const sameCategory = p.category === project.category;
+              const sharedTech = p.technologies.some((tech) =>
+                project.technologies.includes(tech)
+              );
+              
+              return sameCategory || sharedTech;
+            })
+            .slice(0, 3)
+            .map((relatedProject) => (
+              <Link
+                key={relatedProject.id}
+                href={`/projects/${relatedProject.id}`}
+                className="group"
+              >
+                <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-background/70 shadow-lg backdrop-blur transition-all duration-300 hover:shadow-2xl hover:border-primary/50">
+                  <div className="relative h-48 overflow-hidden">
+                    <Image
+                      src={relatedProject.image}
+                      alt={relatedProject.title}
+                      width={600}
+                      height={400}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground/70 mb-2">
+                      {relatedProject.category}
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
+                      {relatedProject.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {relatedProject.summary}
+                    </p>
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      {relatedProject.technologies.slice(0, 3).map((tech) => (
+                        <Badge
+                          key={tech}
+                          variant="secondary"
+                          className="bg-primary/5 text-foreground/80 text-xs"
+                        >
+                          {tech}
+                        </Badge>
+                      ))}
+                      {relatedProject.technologies.length > 3 && (
+                        <Badge
+                          variant="secondary"
+                          className="bg-primary/5 text-foreground/80 text-xs"
+                        >
+                          +{relatedProject.technologies.length - 3}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
         </div>
       </div>
     </div>

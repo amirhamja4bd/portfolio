@@ -83,32 +83,34 @@ export function SkillsSection() {
       </div>
 
       {/* Animated Category Tabs */}
-      <div className="mt-8 rounded-2xl border border-border/60 bg-background/70 p-2 shadow-lg backdrop-blur">
-        <div className="relative flex flex-wrap gap-1">
-          {skillsData.categories.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => setActiveCategory(category.id)}
-              className={`relative z-10 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
-                activeCategory === category.id
-                  ? "text-foreground"
-                  : "text-muted-foreground hover:text-foreground/80"
-              }`}
-            >
-              {activeCategory === category.id && (
-                <motion.div
-                  layoutId="activeSkillCategory"
-                  className="absolute inset-0 rounded-lg bg-primary/10 border border-primary/20"
-                  transition={{
-                    type: "spring",
-                    stiffness: 500,
-                    damping: 30,
-                  }}
-                />
-              )}
-              <span className="relative z-10">{category.label}</span>
-            </button>
-          ))}
+      <div className=" flex justify-center">
+        <div className="mt-8 rounded-2xl border border-border/60 bg-background/70 p-2 shadow-lg backdrop-blur w-fit">
+          <div className="relative flex flex-wrap gap-1">
+            {skillsData.categories.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => setActiveCategory(category.id)}
+                className={`relative z-10 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
+                  activeCategory === category.id
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground/80"
+                }`}
+              >
+                {activeCategory === category.id && (
+                  <motion.div
+                    layoutId="activeSkillCategory"
+                    className="absolute inset-0 rounded-lg bg-primary/10 border border-primary/20"
+                    transition={{
+                      type: "spring",
+                      stiffness: 500,
+                      damping: 30,
+                    }}
+                  />
+                )}
+                <span className="relative z-10">{category.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

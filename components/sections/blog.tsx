@@ -20,7 +20,7 @@ export function BlogSection() {
           </p>
         </div>
         <Button asChild variant="outline">
-          <Link href="/blog" className="flex items-center gap-2">
+          <Link href="/blogs" className="flex items-center gap-2">
             View all posts <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>
@@ -56,7 +56,7 @@ export function BlogSection() {
               className="mt-auto w-fit px-0 text-sm"
             >
               <Link
-                href={`/blog/${post.slug}`}
+                href={`/blogs/${post.slug}`}
                 className="flex items-center gap-2"
               >
                 Read article <ArrowRight className="h-4 w-4" />
