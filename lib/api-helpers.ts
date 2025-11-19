@@ -36,7 +36,7 @@ export function apiError(message: string, status: number = 400, errors?: any) {
 /**
  * Middleware to protect API routes
  */
-export async function withAuth(
+export function withAuth(
   handler: (
     request: NextRequest,
     context: { params?: any; user: any }

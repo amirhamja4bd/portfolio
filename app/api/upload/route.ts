@@ -85,10 +85,3 @@ async function uploadHandler(request: NextRequest, { user }: { user: any }) {
 
 // POST /api/upload - Upload an image file (Protected)
 export const POST = withAuth(withErrorHandling(uploadHandler));
-
-// Configure route
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};

@@ -1,4 +1,5 @@
 import { AnimatedBackground } from "@/components/animated-background";
+import { FloatingCodeBrackets } from "@/components/floating-code-brackets";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import type { Metadata } from "next";
@@ -39,6 +40,7 @@ export default function UserLayout({
     <>
       <div className="fixed inset-0 -z-10">
         <AnimatedBackground />
+        <FloatingCodeBrackets />
         <div className="absolute inset-0 bg-linear-to-b from-background via-background/60 to-background" />
       </div>
       <div className="relative flex min-h-screen flex-col">
