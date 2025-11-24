@@ -1,15 +1,65 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type TabType = "snapshot" | "education" | "certifications" | "interests";
 
-const aboutData = {
+interface InfoCard {
+  title: string;
+  description: string;
+}
+
+interface SnapshotItem {
+  label: string;
+  value: string;
+}
+
+interface EducationItem {
+  school: string;
+  degree: string;
+  year: string;
+}
+
+interface CertificationItem {
+  name: string;
+  issuer: string;
+  year: string;
+}
+
+interface InterestItem {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+interface AboutData {
+  title: string;
+  description: string;
+  infoCards: InfoCard[];
+  snapshot: {
+    title: string;
+    items: SnapshotItem[];
+  };
+  education: {
+    title: string;
+    items: EducationItem[];
+  };
+  certifications: {
+    title: string;
+    items: CertificationItem[];
+  };
+  interests: {
+    title: string;
+    description: string;
+    items: InterestItem[];
+  };
+}
+
+const defaultAboutData: AboutData = {
   title: "About",
   description:
     "I lead teams shipping complex products while maintaining a craftsman mindset. From redesigning deployment platforms to mentoring engineers through promotions, I specialize in the intersection of developer experience, platform reliability, and product delivery.",
-
   infoCards: [
     {
       title: "Mission",
@@ -22,14 +72,6 @@ const aboutData = {
         "Translating ambiguous ideas into roadmaps, then delivering them with systems thinking and dogfooding-driven feedback loops.",
     },
   ],
-
-  tabs: [
-    { id: "snapshot" as TabType, label: "Snapshot" },
-    { id: "education" as TabType, label: "Education" },
-    { id: "certifications" as TabType, label: "Certifications" },
-    { id: "interests" as TabType, label: "Interests" },
-  ],
-
   snapshot: {
     title: "Professional Snapshot",
     items: [
@@ -43,7 +85,8 @@ const aboutData = {
       },
       {
         label: "Availability",
-        value: "Open to principal-level roles & technical leadership engagements",
+        value:
+          "Open to principal-level roles & technical leadership engagements",
       },
       {
         label: "Focus Areas",
@@ -51,7 +94,6 @@ const aboutData = {
       },
     ],
   },
-
   education: {
     title: "Education",
     items: [
@@ -67,7 +109,6 @@ const aboutData = {
       },
     ],
   },
-
   certifications: {
     title: "Professional Certifications",
     items: [
@@ -83,7 +124,6 @@ const aboutData = {
       },
     ],
   },
-
   interests: {
     title: "Beyond the Keyboard",
     description:
@@ -113,8 +153,47 @@ const aboutData = {
   },
 };
 
+const tabs = [
+  { id: "snapshot" as TabType, label: "Snapshot" },
+  { id: "education" as TabType, label: "Education" },
+  { id: "certifications" as TabType, label: "Certifications" },
+  { id: "interests" as TabType, label: "Interests" },
+];
+
 export function AboutSection() {
   const [activeTab, setActiveTab] = useState<TabType>("snapshot");
+  const [aboutData, setAboutData] = useState<AboutData>(defaultAboutData);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAboutData = async () => {
+      try {
+        const response = await fetch("/api/about");
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.data) {
+            setAboutData(result.data);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching about data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAboutData();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <section id="about" className="relative scroll-mt-24">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-pulse text-muted-foreground">Loading...</div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="about" className="relative scroll-mt-24">
@@ -153,7 +232,7 @@ export function AboutSection() {
           {/* Animated Tabs Navigation */}
           <div className="rounded-2xl border border-border/60 bg-background/70 p-2 shadow-lg backdrop-blur">
             <div className="relative flex gap-1">
-              {aboutData.tabs.map((tab) => (
+              {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}

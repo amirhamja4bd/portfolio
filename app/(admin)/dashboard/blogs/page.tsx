@@ -1,21 +1,20 @@
 "use client";
 
-import { BlogFormModal } from "@/components/admin/blog-form-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRequireAuth } from "@/contexts/auth-context";
 import { blogApi } from "@/lib/api-client";
 import { motion } from "framer-motion";
 import { Calendar, Eye, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function BlogsPage() {
+  const router = useRouter();
   const { user, loading } = useRequireAuth();
   const [blogs, setBlogs] = useState<any[]>([]);
   const [loadingBlogs, setLoadingBlogs] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingBlog, setEditingBlog] = useState<any>(null);
 
   useEffect(() => {
     if (user) {
@@ -36,13 +35,11 @@ export default function BlogsPage() {
   };
 
   const handleCreate = () => {
-    setEditingBlog(null);
-    setIsModalOpen(true);
+    router.push("/dashboard/blogs/form");
   };
 
   const handleEdit = (blog: any) => {
-    setEditingBlog(blog);
-    setIsModalOpen(true);
+    router.push(`/dashboard/blogs/form?slug=${blog.slug}`);
   };
 
   const handleDelete = async (slug: string) => {
@@ -57,17 +54,13 @@ export default function BlogsPage() {
     }
   };
 
-  const handleSuccess = () => {
-    setIsModalOpen(false);
-    setEditingBlog(null);
-    fetchBlogs();
-  };
-
   const filteredBlogs = blogs.filter(
     (blog) =>
       blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      blog.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      blog.category.toLowerCase().includes(searchQuery.toLowerCase())
+      blog.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      blog.tags?.some((tag: string) =>
+        tag.toLowerCase().includes(searchQuery.toLowerCase())
+      )
   );
 
   const formatDate = (date: string) => {
@@ -156,9 +149,9 @@ export default function BlogsPage() {
                 className="group rounded-xl border bg-card p-5 hover:shadow-lg transition-all"
               >
                 <div className="flex items-start gap-4">
-                  {blog.coverImage && (
+                  {blog.thumbnail && (
                     <img
-                      src={blog.coverImage}
+                      src={blog.thumbnail}
                       alt={blog.title}
                       className="w-32 h-20 object-cover rounded-lg shrink-0"
                     />
@@ -170,7 +163,7 @@ export default function BlogsPage() {
                           {blog.title}
                         </h3>
                         <p className="text-sm text-muted-foreground line-clamp-2">
-                          {blog.excerpt}
+                          {blog.category} • {blog.tags?.slice(0, 3).join(", ")}
                         </p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
@@ -232,14 +225,6 @@ export default function BlogsPage() {
           </div>
         )}
       </motion.div>
-
-      {/* Modal */}
-      <BlogFormModal
-        open={isModalOpen}
-        onOpenChange={setIsModalOpen}
-        blog={editingBlog}
-        onSuccess={handleSuccess}
-      />
     </div>
   );
 }

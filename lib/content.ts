@@ -189,10 +189,14 @@ export interface BlogPostPreview {
   id: string;
   title: string;
   slug: string;
-  excerpt: string;
   tags: string[];
-  readingTime: string;
+  category?: string; // Optional for backward compatibility
   publishedAt: string;
+  thumbnail?: string;
+  // Legacy fields for static demo data
+  excerpt?: string;
+  readingTime?: string;
+  coverImage?: string;
 }
 
 export interface BlogPost extends BlogPostPreview {
@@ -202,7 +206,7 @@ export interface BlogPost extends BlogPostPreview {
     avatar: string;
     role: string;
   };
-  coverImage: string;
+  images?: string[];
   views?: number;
 }
 

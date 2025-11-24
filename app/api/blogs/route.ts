@@ -78,29 +78,22 @@ async function createBlogPostHandler(
   const body = await parseBody(request);
 
   // Validate required fields
-  if (!body.title || !body.excerpt || !body.content) {
-    return apiError("Title, excerpt, and content are required", 400);
+  if (!body.title || !body.content) {
+    return apiError("Title and content are required", 400);
   }
 
-  // Generate slug from title
-  const slug = slugify(body.title, { lower: true, strict: true });
+  // Generate slug from title if not provided
+  let slug = body.slug;
+  if (!slug) {
+    slug = slugify(body.title, { lower: true, strict: true });
+  }
 
   // Check if slug already exists
   const existingPost = await BlogPost.findOne({ slug });
   if (existingPost) {
-    return apiError("A post with this title already exists", 409);
+    // Append timestamp to make slug unique
+    slug = `${slug}-${Date.now()}`;
   }
-
-  // Calculate reading time based on content
-  let wordCount = 0;
-  if (body.content?.blocks) {
-    body.content.blocks.forEach((block: any) => {
-      if (block.data?.text) {
-        wordCount += block.data.text.split(/\s+/).length;
-      }
-    });
-  }
-  const readingTime = Math.ceil(wordCount / 200); // Average reading speed
 
   // Set publishedAt if publishing
   const publishedAt = body.published ? new Date() : undefined;
@@ -109,7 +102,6 @@ async function createBlogPostHandler(
   const post = await BlogPost.create({
     ...body,
     slug,
-    readingTime: `${readingTime} min read`,
     publishedAt,
     views: 0,
   });

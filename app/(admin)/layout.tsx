@@ -1,6 +1,8 @@
 "use client";
 
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
+import { AnimatedBackground } from "@/components/animated-background";
+import { FloatingCodeBrackets } from "@/components/floating-code-brackets";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -24,7 +26,13 @@ function AdminLayoutContent({ children }: { children: ReactNode }) {
 
   // Don't show sidebar on login/register pages
   if (pathname === "/login" || pathname === "/register") {
-    return <>{children}</>;
+    return (
+      <div className="">
+        <AnimatedBackground />
+        <div className="absolute inset-0e bg-linear-to-b from-background/20 via-background/20 to-background/20" />
+        {children}
+      </div>
+    );
   }
 
   // Generate breadcrumb from pathname

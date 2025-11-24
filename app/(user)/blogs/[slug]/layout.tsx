@@ -15,13 +15,17 @@ export async function generateMetadata({
     };
   }
 
+  const description =
+    post.excerpt || post.category || post.tags.slice(0, 3).join(", ");
+  const image = post.thumbnail || post.coverImage;
+
   return {
     title: post.title,
-    description: post.excerpt,
+    description: description,
     openGraph: {
       title: post.title,
-      description: post.excerpt,
-      images: [post.coverImage],
+      description: description,
+      images: image ? [image] : undefined,
       type: "article",
       publishedTime: post.publishedAt,
       authors: [post.author.name],
@@ -30,8 +34,8 @@ export async function generateMetadata({
     twitter: {
       card: "summary_large_image",
       title: post.title,
-      description: post.excerpt,
-      images: [post.coverImage],
+      description: description,
+      images: image ? [image] : undefined,
     },
   };
 }

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useMemo } from "react";
+import { FloatingCodeBrackets } from "./floating-code-brackets";
 
 const blobs = [
   { size: 520, hue: 210, duration: 18 },
@@ -44,6 +45,7 @@ export function AnimatedBackground() {
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <FloatingCodeBrackets />
       {/* Transparent animated grid overlay */}
       <div className="absolute inset-0 z-10">
         <div

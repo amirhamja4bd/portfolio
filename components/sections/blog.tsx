@@ -43,7 +43,7 @@ export function BlogSection() {
               {post.title}
             </h3>
             <p className="mt-3 text-sm text-muted-foreground">{post.excerpt}</p>
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-4 flex flex-wrap gap-2 mb-1">
               {post.tags.map((tag) => (
                 <Badge key={tag} variant="secondary">
                   {tag}

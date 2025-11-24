@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Calendar, Clock, Search } from "lucide-react";
+import { ArrowRight, Calendar, Search } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -42,7 +42,6 @@ export default function BlogsPage() {
       posts = posts.filter(
         (post) =>
           post.title.toLowerCase().includes(query) ||
-          post.excerpt.toLowerCase().includes(query) ||
           post.tags.some((tag) => tag.toLowerCase().includes(query))
       );
     }
@@ -167,14 +166,16 @@ export default function BlogsPage() {
                   className="group relative overflow-hidden rounded-3xl border bg-card transition-all hover:shadow-xl"
                 >
                   {/* Cover Image */}
-                  <div className="relative aspect-video overflow-hidden bg-muted">
-                    <img
-                      src={post.coverImage}
-                      alt={post.title}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-linear-to-t from-background/80 to-transparent" />
-                  </div>
+                  {(post.thumbnail || (post as any).coverImage) && (
+                    <div className="relative aspect-video overflow-hidden bg-muted">
+                      <img
+                        src={post.thumbnail || (post as any).coverImage}
+                        alt={post.title}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-linear-to-t from-background/80 to-transparent" />
+                    </div>
+                  )}
 
                   {/* Content */}
                   <div className="p-6">
@@ -183,10 +184,6 @@ export default function BlogsPage() {
                       <span className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
                         {post.publishedAt}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {post.readingTime}
                       </span>
                       {post.views && (
                         <span className="flex items-center gap-1">
@@ -205,10 +202,12 @@ export default function BlogsPage() {
                       </Link>
                     </h2>
 
-                    {/* Excerpt */}
-                    <p className="mb-4 text-sm text-muted-foreground line-clamp-2">
-                      {post.excerpt}
-                    </p>
+                    {/* Category or Tags Preview */}
+                    {post.category && (
+                      <p className="mb-4 text-sm text-muted-foreground line-clamp-2">
+                        {post.category}
+                      </p>
+                    )}
 
                     {/* Tags */}
                     <div className="mb-4 flex flex-wrap gap-2">

@@ -46,6 +46,16 @@ const navigationItems = [
     icon: LayoutDashboard,
   },
   {
+    name: "Hero",
+    href: "/dashboard/hero",
+    icon: Home,
+  },
+  {
+    name: "About",
+    href: "/dashboard/about",
+    icon: User,
+  },
+  {
     name: "Blog Posts",
     href: "/dashboard/blogs",
     icon: FileText,

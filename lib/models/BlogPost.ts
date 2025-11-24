@@ -3,10 +3,10 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 export interface IBlogPost extends Document {
   title: string;
   slug: string;
-  excerpt: string;
-  content: any; // Editor.js JSON format
-  coverImage?: string;
+  content: any; // Novel.sh JSON format
   tags: string[];
+  thumbnail?: string;
+  images: string[];
   category: string;
   author: {
     name: string;
@@ -14,7 +14,6 @@ export interface IBlogPost extends Document {
   };
   published: boolean;
   featured: boolean;
-  readingTime: string;
   views: number;
   publishedAt?: Date;
   createdAt: Date;
@@ -31,7 +30,6 @@ const BlogPostSchema = new Schema<IBlogPost>(
     },
     slug: {
       type: String,
-      required: [true, "Slug is required"],
       unique: true,
       lowercase: true,
       trim: true,
@@ -40,19 +38,9 @@ const BlogPostSchema = new Schema<IBlogPost>(
         "Slug must contain only lowercase letters, numbers, and hyphens",
       ],
     },
-    excerpt: {
-      type: String,
-      required: [true, "Excerpt is required"],
-      trim: true,
-      maxlength: [500, "Excerpt cannot exceed 500 characters"],
-    },
     content: {
       type: Schema.Types.Mixed,
       required: [true, "Content is required"],
-    },
-    coverImage: {
-      type: String,
-      trim: true,
     },
     tags: {
       type: [String],
@@ -63,6 +51,14 @@ const BlogPostSchema = new Schema<IBlogPost>(
         },
         message: "Cannot have more than 10 tags",
       },
+    },
+    thumbnail: {
+      type: String,
+      trim: true,
+    },
+    images: {
+      type: [String],
+      default: [],
     },
     category: {
       type: String,
@@ -84,10 +80,6 @@ const BlogPostSchema = new Schema<IBlogPost>(
     featured: {
       type: Boolean,
       default: false,
-    },
-    readingTime: {
-      type: String,
-      default: "5 min read",
     },
     views: {
       type: Number,

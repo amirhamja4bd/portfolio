@@ -148,18 +148,20 @@ export default function BlogPostClient({
       <article className="container py-12">
         <div className="mx-auto max-w-6xl">
           {/* Cover Image */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="relative mb-12 aspect-video overflow-hidden rounded-3xl"
-          >
-            <img
-              src={post.coverImage}
-              alt={post.title}
-              className="h-full w-full object-cover"
-            />
-          </motion.div>
+          {(post.thumbnail || post.coverImage) && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="relative mb-12 aspect-video overflow-hidden rounded-3xl"
+            >
+              <img
+                src={post.thumbnail || post.coverImage}
+                alt={post.title}
+                className="h-full w-full object-cover"
+              />
+            </motion.div>
+          )}
 
           {/* Meta Info */}
           <motion.div
@@ -172,10 +174,12 @@ export default function BlogPostClient({
               <Calendar className="h-4 w-4" />
               {post.publishedAt}
             </span>
-            <span className="flex items-center gap-1">
-              <Clock className="h-4 w-4" />
-              {post.readingTime}
-            </span>
+            {post.readingTime && (
+              <span className="flex items-center gap-1">
+                <Clock className="h-4 w-4" />
+                {post.readingTime}
+              </span>
+            )}
             {post.views && (
               <span className="flex items-center gap-1">
                 <Eye className="h-4 w-4" />
@@ -195,14 +199,16 @@ export default function BlogPostClient({
           </motion.h1>
 
           {/* Excerpt */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="mb-8 text-xl text-muted-foreground"
-          >
-            {post.excerpt}
-          </motion.p>
+          {post.excerpt && (
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="mb-8 text-xl text-muted-foreground"
+            >
+              {post.excerpt}
+            </motion.p>
+          )}
 
           {/* Tags */}
           <motion.div
@@ -318,9 +324,11 @@ export default function BlogPostClient({
                     <h3 className="mb-2 font-semibold leading-tight transition-colors group-hover:text-primary">
                       {relatedPost.title}
                     </h3>
-                    <p className="mb-3 line-clamp-2 text-sm text-muted-foreground">
-                      {relatedPost.excerpt}
-                    </p>
+                    {relatedPost.excerpt && (
+                      <p className="mb-3 line-clamp-2 text-sm text-muted-foreground">
+                        {relatedPost.excerpt}
+                      </p>
+                    )}
                     <div className="flex flex-wrap gap-1">
                       {relatedPost.tags.slice(0, 2).map((tag) => (
                         <Badge

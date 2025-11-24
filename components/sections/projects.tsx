@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ExternalLink, Github } from "lucide-react";
+import { ArrowUpRight, ExternalLink, Github, Play } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -25,93 +25,143 @@ export function ProjectsSection() {
         <p className="text-muted-foreground">{projectsData.description}</p>
       </div>
 
-      <div className="mt-12 grid gap-6 lg:grid-cols-2">
+      <div className="mt-12 grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
         {projects.map((project, index) => (
           <motion.article
             key={project.id}
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.6, ease: "easeOut", delay: index * 0.1 }}
-            className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/40 bg-linear-to-br from-card via-card/95 to-card/90 shadow-lg backdrop-blur-sm transition-all duration-500 hover:shadow-2xl hover:border-primary/50 hover:-translate-y-1"
+            transition={{ duration: 0.5, ease: "easeOut", delay: index * 0.1 }}
+            className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/40 bg-linear-to-br from-card/90 via-card to-card shadow-sm backdrop-blur-sm transition-all duration-400 hover:shadow-xl hover:border-primary/20 hover:-translate-y-1"
           >
             {/* Featured Badge */}
             {project.featured && (
-              <div className="absolute top-3 right-3 z-10">
-                <Badge className="bg-linear-to-r from-emerald-500 to-teal-500 text-white shadow-lg border-0 px-3 py-1">
-                  ⭐ Featured
+              <div className="absolute top-3 right-3 z-20">
+                <Badge className="bg-linear-to-r from-amber-400 to-orange-500 text-white shadow-md border-0 px-2 py-0.5 text-xs font-medium">
+                  Featured
                 </Badge>
               </div>
             )}
 
-            {/* Project Image */}
-            <ProjectMedia project={project} />
-
-            {/* Project Content */}
-            <div className="flex flex-1 flex-col gap-4 p-6">
-              {/* Category & Title */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="h-1 w-8 bg-linear-to-r from-primary to-primary/50 rounded-full" />
-                  <span className="text-xs uppercase tracking-wider font-semibold text-primary/80">
-                    {project.category}
-                  </span>
+            {/* Compact Image Section */}
+            <div className="relative aspect-video overflow-hidden">
+              <Link
+                href={`/projects/${project.id}`}
+                className="block h-full w-full"
+              >
+                <Image
+                  src={project.image}
+                  alt={project.title}
+                  width={400}
+                  height={225}
+                  className="h-full w-full object-cover transition-all duration-600 group-hover:scale-110"
+                />
+                
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity duration-500" />
+                
+                {/* Quick Actions Overlay */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black/30">
+                  <div className="flex items-center gap-2 rounded-full bg-white/95 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold text-gray-900 shadow-lg transform scale-95 group-hover:scale-100 transition-transform duration-300">
+                    <Play className="h-3 w-3 fill-current" />
+                    View Project
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2">
+              </Link>
+            </div>
+
+            {/* Compact Content */}
+            <div className="flex flex-1 flex-col gap-3 p-4">
+              {/* Header */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Badge 
+                    variant="outline" 
+                    className="text-xs font-medium text-muted-foreground border-border px-2 py-0 h-5"
+                  >
+                    {project.category}
+                  </Badge>
+                  
+                  {/* Quick Action Icons */}
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    {project.githubUrl && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-6 w-6 rounded-sm"
+                        asChild
+                      >
+                        <a href={project.githubUrl} target="_blank" rel="noreferrer">
+                          <Github className="h-3 w-3" />
+                        </a>
+                      </Button>
+                    )}
+                    {project.demoUrl && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-6 w-6 rounded-sm"
+                        asChild
+                      >
+                        <a href={project.demoUrl} target="_blank" rel="noreferrer">
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                
+                <h3 className="text-lg font-semibold text-foreground line-clamp-2 leading-tight group-hover:text-primary transition-colors">
                   {project.title}
                 </h3>
-                <p className="text-sm leading-relaxed text-muted-foreground line-clamp-2">
-                  {project.summary}
-                </p>
               </div>
 
-              {/* Technologies */}
-              <div className="flex flex-wrap gap-1.5">
+              {/* Summary */}
+              <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed flex-1">
+                {project.summary}
+              </p>
+
+              {/* Technologies - Ultra Compact */}
+              <div className="flex flex-wrap gap-1">
                 {project.technologies.slice(0, 4).map((tech) => (
-                  <Badge
+                  <span
                     key={tech}
-                    variant="secondary"
-                    className="bg-primary/8 text-xs text-foreground/70 hover:bg-primary/15 hover:text-foreground transition-all border border-primary/10 px-2 py-0.5"
+                    className="inline-block text-xs text-muted-foreground bg-secondary/30 px-1.5 py-0.5 rounded-md border border-border/50"
                   >
                     {tech}
-                  </Badge>
+                  </span>
                 ))}
                 {project.technologies.length > 4 && (
-                  <Badge
-                    variant="secondary"
-                    className="bg-muted text-xs text-muted-foreground px-2 py-0.5"
-                  >
+                  <span className="inline-block text-xs text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded-md">
                     +{project.technologies.length - 4}
-                  </Badge>
+                  </span>
                 )}
               </div>
 
               {/* Action Buttons */}
-              <div className="mt-auto flex items-center gap-2 pt-3">
+              <div className="flex items-center gap-2 pt-2">
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 text-xs font-medium text-primary hover:text-primary hover:bg-primary/10 px-2 flex-1 justify-start"
+                >
+                  <Link href={`/projects/${project.id}`} className="flex items-center gap-1">
+                    Case study
+                    <ArrowUpRight className="h-3 w-3" />
+                  </Link>
+                </Button>
+                
                 {project.demoUrl && (
                   <Button
                     asChild
                     size="sm"
-                    className="flex-1 h-9 shadow-md hover:shadow-lg transition-shadow"
+                    className="h-7 px-2 text-xs font-medium bg-primary/10 hover:bg-primary/20 text-primary border-0"
                   >
-                    <a href={project.demoUrl} target="_blank" rel="noreferrer">
-                      <ExternalLink className="mr-1.5 h-3.5 w-3.5" /> Live Demo
-                    </a>
-                  </Button>
-                )}
-                {project.githubUrl && (
-                  <Button
-                    asChild
-                    size="sm"
-                    variant="outline"
-                    className="flex-1 h-9 hover:bg-primary/5 transition-colors"
-                  >
-                    <a
-                      href={project.githubUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <Github className="mr-1.5 h-3.5 w-3.5" /> Code
+                    <a href={project.demoUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1">
+                      <Play className="h-3 w-3" />
+                      Demo
                     </a>
                   </Button>
                 )}
@@ -121,30 +171,5 @@ export function ProjectsSection() {
         ))}
       </div>
     </section>
-  );
-}
-
-function ProjectMedia({ project }: { project: (typeof projects)[number] }) {
-  return (
-    <Link
-      href={`/projects/${project.id}`}
-      className="group/image relative overflow-hidden bg-muted block aspect-video"
-    >
-      <Image
-        src={project.image}
-        alt={project.title}
-        width={1200}
-        height={800}
-        className="h-full w-full object-cover transition-all duration-700 group-hover/image:scale-110 group-hover/image:brightness-90"
-      />
-      <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent opacity-60 group-hover/image:opacity-100 transition-opacity duration-500" />
-
-      {/* Hover Overlay */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/image:opacity-100 transition-all duration-300">
-        <div className="rounded-full bg-primary/90 backdrop-blur-sm px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-xl transform translate-y-2 group-hover/image:translate-y-0 transition-transform duration-300">
-          View Case Study →
-        </div>
-      </div>
-    </Link>
   );
 }

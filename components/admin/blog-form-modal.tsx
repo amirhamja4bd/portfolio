@@ -18,7 +18,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { blogApi } from "@/lib/api-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -26,15 +25,13 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
+import { Textarea } from "@/components/ui/textarea";
+
 const blogFormSchema = z.object({
   title: z.string().min(1, "Title is required").max(200),
-  excerpt: z.string().min(1, "Excerpt is required").max(500),
-  content: z.any().optional(),
-  coverImage: z
-    .string()
-    .url("Must be a valid URL")
-    .optional()
-    .or(z.literal("")),
+  content: z.string().optional(),
+  thumbnail: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  images: z.string().optional(), // Comma-separated URLs
   tags: z.string().optional(),
   category: z.string().min(1, "Category is required"),
   published: z.boolean().optional(),
@@ -63,9 +60,9 @@ export function BlogFormModal({
     resolver: zodResolver(blogFormSchema),
     defaultValues: {
       title: "",
-      excerpt: "",
-      content: { blocks: [] },
-      coverImage: "",
+      content: "",
+      thumbnail: "",
+      images: "",
       tags: "",
       category: "",
       published: false,
@@ -73,13 +70,14 @@ export function BlogFormModal({
     },
   });
 
+  // Reset form when blog changes or modal opens/closes
   useEffect(() => {
     if (blog) {
       form.reset({
         title: blog.title || "",
-        excerpt: blog.excerpt || "",
-        content: blog.content || { blocks: [] },
-        coverImage: blog.coverImage || "",
+        content: blog.content || "",
+        thumbnail: blog.thumbnail || "",
+        images: blog.images?.join(", ") || "",
         tags: blog.tags?.join(", ") || "",
         category: blog.category || "",
         published: blog.published || false,
@@ -88,16 +86,16 @@ export function BlogFormModal({
     } else {
       form.reset({
         title: "",
-        excerpt: "",
-        content: { blocks: [] },
-        coverImage: "",
+        content: "",
+        thumbnail: "",
+        images: "",
         tags: "",
         category: "",
         published: false,
         featured: false,
       });
     }
-  }, [blog, form]);
+  }, [blog, open]); // Added 'open' to dependencies to reset when modal opens
 
   const onSubmit = async (data: BlogFormValues) => {
     try {
@@ -111,14 +109,12 @@ export function BlogFormModal({
               .map((tag) => tag.trim())
               .filter(Boolean)
           : [],
-        content: data.content || {
-          blocks: [
-            {
-              type: "paragraph",
-              data: { text: data.excerpt },
-            },
-          ],
-        },
+        images: data.images
+          ? data.images
+              .split(",")
+              .map((img) => img.trim())
+              .filter(Boolean)
+          : [],
       };
 
       if (isEditing) {
@@ -128,7 +124,10 @@ export function BlogFormModal({
       }
 
       onSuccess();
+
+      // Reset form after successful submission
       form.reset();
+      onOpenChange(false);
     } catch (error: any) {
       console.error("Failed to save blog:", error);
       alert(error.message || "Failed to save blog post");
@@ -169,20 +168,19 @@ export function BlogFormModal({
 
             <FormField
               control={form.control}
-              name="excerpt"
+              name="content"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Excerpt *</FormLabel>
+                  <FormLabel>Content *</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Brief summary of the blog post"
-                      rows={3}
+                      placeholder="Write your blog content here..."
+                      className="min-h-[400px] resize-none"
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    A short description that appears in the blog list (max 500
-                    characters)
+                    Write your blog content in plain text
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -228,17 +226,41 @@ export function BlogFormModal({
 
             <FormField
               control={form.control}
-              name="coverImage"
+              name="thumbnail"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Cover Image URL</FormLabel>
+                  <FormLabel>Thumbnail URL</FormLabel>
                   <FormControl>
                     <Input
                       type="url"
-                      placeholder="https://example.com/image.jpg"
+                      placeholder="https://example.com/thumbnail.jpg"
                       {...field}
                     />
                   </FormControl>
+                  <FormDescription>
+                    Main image for the blog post preview
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="images"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Additional Images</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Separate multiple image URLs with commas
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

@@ -2,71 +2,64 @@
 
 import { motion } from "framer-motion";
 import { Github, Linkedin, Mail } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { HeroData } from "@/types/hero";
 
-const heroData = {
-  badge: {
-    text: "WELCOME TO MY WORLD",
-  },
-  techStack: [
-    "Next.js",
-    "React",
-    "TypeScript",
-    "Node.js",
-    "GraphQL",
-    "MongoDB",
-    "AWS",
-    "Framer Motion",
-    "Editor.js",
-  ],
-  heading: {
-    name: "I'm Amir Hamza",
-    title: "Software Engineer (Frontend)",
-  },
-
-  bio: `Architecting scalable systems and leading platform initiatives that drive business impact. 
-  Specialized in distributed systems, cloud infrastructure, and engineering excellence.`,
-
-  cta: {
-    primary: {
-      text: "View Projects",
-      href: "#projects",
-    },
-    secondary: {
-      text: "Get in Touch",
-      href: "#contact",
-    },
-  },
-
-  stats: [
-    { label: "Years Experience", value: "6+" },
-    { label: "Projects Delivered", value: "24+" },
-    { label: "Engineers Mentored", value: "15+" },
-  ],
-
-  expertise: [
-    "Platform Engineering",
-    "Distributed Systems",
-    "Cloud Architecture (AWS)",
-    "DevOps & CI/CD",
-    "Microservices",
-    "Technical Leadership",
-  ],
-
-  socialLinks: [
-    { icon: Github, href: "https://github.com/amirhamja4bd", label: "GitHub" },
-    {
-      icon: Linkedin,
-      href: "https://linkedin.com/in/amirhamza",
-      label: "LinkedIn",
-    },
-    { icon: Mail, href: "mailto:contact@amirhamza.com", label: "Email" },
-  ],
+// Icon mapping for social links
+const iconMap = {
+  Github,
+  Linkedin,
+  Mail,
 };
 
 export function HeroSection() {
+  const [heroData, setHeroData] = useState<HeroData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchHeroData() {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const response = await fetch("/api/hero");
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch hero data");
+        }
+
+        const result = await response.json();
+
+        if (result.success && result.data) {
+          setHeroData(result.data);
+        } else {
+          throw new Error(result.error || "Failed to load hero data");
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchHeroData();
+  }, []);
+
+  // Loading state
+  if (isLoading) {
+    return "Loading...";
+    // return <HeroSkeleton />;
+  }
+
+  // Error state
+  if (error || !heroData) {
+    return "Hero data not found";
+    // return <HeroError error={error || "Hero data not found"} />;
+  }
+
   return (
     <section id="hero" className="relative py-8">
       <div className="container">
@@ -130,15 +123,16 @@ export function HeroSection() {
               className="flex gap-4 pt-4"
             >
               {heroData.socialLinks.map((social) => {
-                const Icon = social.icon;
+                const Icon =
+                  iconMap[social.icon as keyof typeof iconMap] || Mail;
                 return (
                   <a
-                    key={social.label}
-                    href={social.href}
+                    key={social.title}
+                    href={social.link}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background transition-colors hover:border-foreground hover:bg-muted"
-                    aria-label={social.label}
+                    aria-label={social.title}
                   >
                     <Icon className="h-5 w-5" />
                   </a>
@@ -149,16 +143,16 @@ export function HeroSection() {
 
           {/* Right Column - Code Terminal */}
           <div className="flex flex-col justify-center">
-            <CodeTerminal />
+            <CodeTerminal heroData={heroData} />
           </div>
         </div>
-        <TechMarquee />
+        <TechMarquee techStack={heroData.techStack} />
       </div>
     </section>
   );
 }
 
-function CodeTerminal() {
+function CodeTerminal({ heroData }: { heroData: HeroData }) {
   const [currentLine, setCurrentLine] = React.useState(0);
   const [showCursor, setShowCursor] = React.useState(true);
   const [isStreamingComplete, setIsStreamingComplete] = React.useState(false);
@@ -407,7 +401,7 @@ function CodeTerminal() {
   );
 }
 
-function TechMarquee() {
+function TechMarquee({ techStack }: { techStack: string[] }) {
   return (
     <div className="relative mx-auto mt-16 w-[min(100%,64rem)] overflow-hidden rounded-2xl border border-border/50 bg-background/70 py-5 shadow-sm backdrop-blur">
       <div className="pointer-events-none absolute inset-0 bg-linear-to-r from-background via-background/60 to-background opacity-80" />
@@ -417,7 +411,7 @@ function TechMarquee() {
         transition={{ repeat: Infinity, duration: 18, ease: "linear" }}
         className="flex min-w-full gap-10 whitespace-nowrap text-sm uppercase tracking-[0.4em] text-muted-foreground"
       >
-        {[...heroData.techStack, ...heroData.techStack].map((tech, index) => (
+        {[...techStack, ...techStack].map((tech, index) => (
           <span key={`${tech}-${index}`} className="text-muted-foreground/80">
             {tech}
           </span>

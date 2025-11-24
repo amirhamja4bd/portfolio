@@ -49,17 +49,20 @@ async function updateBlogPostHandler(
     return apiError("Blog post not found", 404);
   }
 
-  // Update slug if title changed
-  if (body.title && body.title !== post.title) {
+  // Update slug if title changed and slug not manually provided
+  if (body.title && body.title !== post.title && !body.slug) {
     const newSlug = slugify(body.title, { lower: true, strict: true });
     const existingPost = await BlogPost.findOne({ slug: newSlug });
 
     if (existingPost && String(existingPost._id) !== String(post._id)) {
-      return apiError("A post with this title already exists", 409);
+      // Append timestamp to make slug unique
+      body.slug = `${newSlug}-${Date.now()}`;
+    } else {
+      body.slug = newSlug;
     }
+  }
 
-    body.slug = newSlug;
-  } // Update publishedAt if publishing for the first time
+  // Update publishedAt if publishing for the first time
   if (body.published && !post.published) {
     body.publishedAt = new Date();
   }
