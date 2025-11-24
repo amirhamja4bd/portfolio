@@ -60,12 +60,12 @@ async function ProjectContent({ id }: { id: string }) {
       </div>
 
       {/* Project Details Grid */}
-      <div className="grid gap-12 lg:grid-cols-[2fr_1fr]">
-        {/* Main Content */}
+      <div className="space-y-12">
+        {/* Main Content - Full Width Overview */}
         <div className="space-y-8">
           <div>
             <h2 className="text-2xl font-semibold mb-4">Overview</h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed text-lg">
               {project.description}
             </p>
           </div>
@@ -80,19 +80,19 @@ async function ProjectContent({ id }: { id: string }) {
           )}
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-8">
+        {/* Technologies and Links Section */}
+        <div className="grid gap-6 md:grid-cols-2">
           {/* Technologies */}
-          <div className="rounded-2xl border border-border/60 bg-background/70 p-6 shadow-lg backdrop-blur">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground/70 mb-4">
-              Technologies
+          <div className="rounded-xl border border-border/60 bg-background/70 p-6 shadow-lg backdrop-blur">
+            <h3 className="text-base font-semibold uppercase tracking-[0.15em] text-muted-foreground/70 mb-4">
+              Technologies Used
             </h3>
             <div className="flex flex-wrap gap-2">
               {project.technologies.map((tech) => (
                 <Badge
                   key={tech}
                   variant="secondary"
-                  className="bg-primary/5 text-foreground/80"
+                  className="bg-primary/10 text-foreground/90 px-2.5 py-1 text-sm font-medium"
                 >
                   {tech}
                 </Badge>
@@ -101,24 +101,28 @@ async function ProjectContent({ id }: { id: string }) {
           </div>
 
           {/* Links */}
-          <div className="rounded-2xl border border-border/60 bg-background/70 p-6 shadow-lg backdrop-blur">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground/70 mb-4">
+          <div className="rounded-xl border border-border/60 bg-background/70 p-6 shadow-lg backdrop-blur">
+            <h3 className="text-base font-semibold uppercase tracking-[0.15em] text-muted-foreground/70 mb-4">
               Project Links
             </h3>
             <div className="space-y-3">
               {project.demoUrl && (
-                <Button asChild className="w-full">
+                <Button asChild className="w-full h-10 text-sm">
                   <a href={project.demoUrl} target="_blank" rel="noreferrer">
                     <ExternalLink className="mr-2 h-4 w-4" />
-                    Live Demo
+                    View Live Demo
                   </a>
                 </Button>
               )}
               {project.githubUrl && (
-                <Button asChild variant="outline" className="w-full">
+                <Button
+                  asChild
+                  variant="outline"
+                  className="w-full h-10 text-sm"
+                >
                   <a href={project.githubUrl} target="_blank" rel="noreferrer">
                     <Github className="mr-2 h-4 w-4" />
-                    GitHub Repository
+                    Source Code
                   </a>
                 </Button>
               )}
@@ -135,13 +139,13 @@ async function ProjectContent({ id }: { id: string }) {
             .filter((p) => {
               // Exclude current project
               if (p.id === project.id) return false;
-              
+
               // Include projects from same category or with overlapping technologies
               const sameCategory = p.category === project.category;
               const sharedTech = p.technologies.some((tech) =>
                 project.technologies.includes(tech)
               );
-              
+
               return sameCategory || sharedTech;
             })
             .slice(0, 3)
@@ -210,18 +214,18 @@ function ProjectPageSkeleton() {
         <div className="h-6 w-full max-w-3xl bg-muted animate-pulse rounded" />
       </div>
       <div className="relative overflow-hidden rounded-3xl border border-border mb-12 h-[500px] bg-muted animate-pulse" />
-      <div className="grid gap-12 lg:grid-cols-[2fr_1fr]">
+      <div className="space-y-12">
         <div className="space-y-8">
           <div className="h-8 w-32 bg-muted animate-pulse rounded" />
-          <div className="space-y-2">
-            <div className="h-4 w-full bg-muted animate-pulse rounded" />
-            <div className="h-4 w-full bg-muted animate-pulse rounded" />
-            <div className="h-4 w-3/4 bg-muted animate-pulse rounded" />
+          <div className="space-y-3">
+            <div className="h-5 w-full bg-muted animate-pulse rounded" />
+            <div className="h-5 w-full bg-muted animate-pulse rounded" />
+            <div className="h-5 w-3/4 bg-muted animate-pulse rounded" />
           </div>
         </div>
-        <div className="space-y-8">
-          <div className="rounded-2xl border border-border/60 bg-background/70 p-6 h-48 animate-pulse" />
-          <div className="rounded-2xl border border-border/60 bg-background/70 p-6 h-32 animate-pulse" />
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="rounded-xl border border-border/60 p-6 h-32 bg-muted animate-pulse" />
+          <div className="rounded-xl border border-border/60 p-6 h-32 bg-muted animate-pulse" />
         </div>
       </div>
     </div>

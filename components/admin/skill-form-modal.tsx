@@ -80,7 +80,7 @@ export function SkillFormModal({
       category: "frontend",
       proficiency: 50,
       description: "",
-      icon: "⚡",
+      icon: "",
       isActive: true,
     },
   });
@@ -92,7 +92,7 @@ export function SkillFormModal({
         category: skill.category || "frontend",
         proficiency: skill.proficiency || 50,
         description: skill.description || "",
-        icon: skill.icon || "⚡",
+        icon: skill.icon || "",
         isActive: skill.isActive !== false,
       });
     } else {
@@ -101,7 +101,7 @@ export function SkillFormModal({
         category: "frontend",
         proficiency: 50,
         description: "",
-        icon: "⚡",
+        icon: "",
         isActive: true,
       });
     }
@@ -141,7 +141,7 @@ export function SkillFormModal({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 items-start">
               <FormField
                 control={form.control}
                 name="name"
@@ -163,12 +163,12 @@ export function SkillFormModal({
                   <FormItem>
                     <FormLabel>Icon/Emoji *</FormLabel>
                     <FormControl>
-                      <Input placeholder="⚛️" {...field} />
+                      <Input placeholder="Atom" {...field} />
                     </FormControl>
-                    <FormDescription>
-                      Use an emoji or icon character
-                    </FormDescription>
                     <FormMessage />
+                    <FormDescription>
+                      Use an icon text from Lucide
+                    </FormDescription>
                   </FormItem>
                 )}
               />
@@ -186,7 +186,7 @@ export function SkillFormModal({
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                       </FormControl>

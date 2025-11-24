@@ -1,4 +1,5 @@
 import { AnimatedBackground } from "@/components/animated-background";
+import SplashScreen from "@/components/CodeLoader";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import type { Metadata } from "next";
@@ -37,6 +38,7 @@ export default function UserLayout({
 }>) {
   return (
     <>
+    <SplashScreen />
       <div className="fixed inset-0 -z-10">
         <AnimatedBackground />
         <div className="absolute inset-0 bg-linear-to-b from-background via-background/60 to-background" />

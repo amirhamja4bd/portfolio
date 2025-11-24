@@ -53,10 +53,12 @@ async function createContactHandler(request: NextRequest) {
 
   // Get IP address and user agent
   const ipAddress =
+    body.ipAddress ||
     request.headers.get("x-forwarded-for") ||
     request.headers.get("x-real-ip") ||
     "unknown";
-  const userAgent = request.headers.get("user-agent") || "unknown";
+  const userAgent =
+    body.userAgent || request.headers.get("user-agent") || "unknown";
 
   // Rate limiting check - prevent spam (optional)
   const recentMessages = await Contact.countDocuments({
@@ -73,6 +75,7 @@ async function createContactHandler(request: NextRequest) {
     name: body.name,
     email: body.email.toLowerCase(),
     message: body.message,
+    subject: body.subject,
     ipAddress,
     userAgent,
     status: "unread",

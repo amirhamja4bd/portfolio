@@ -27,7 +27,7 @@ export default function ExperiencePage() {
     try {
       setLoadingExperiences(true);
       const response = await experienceApi.getAll({ all: true });
-      setExperiences(response.data?.data || []);
+      setExperiences(response.data || []);
     } catch (error) {
       console.error("Failed to fetch experiences:", error);
     } finally {

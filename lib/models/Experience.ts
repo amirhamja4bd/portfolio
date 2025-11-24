@@ -10,7 +10,6 @@ export interface IExperience extends Document {
   current: boolean;
   description: string;
   responsibilities: string[];
-  achievements: string[];
   technologies: string[];
   order: number;
   isActive: boolean;
@@ -37,7 +36,6 @@ const ExperienceSchema = new Schema<IExperience>(
     },
     location: {
       type: String,
-      required: [true, "Location is required"],
       trim: true,
     },
     startDate: {
@@ -53,14 +51,9 @@ const ExperienceSchema = new Schema<IExperience>(
     },
     description: {
       type: String,
-      required: [true, "Description is required"],
       trim: true,
     },
     responsibilities: {
-      type: [String],
-      default: [],
-    },
-    achievements: {
       type: [String],
       default: [],
     },

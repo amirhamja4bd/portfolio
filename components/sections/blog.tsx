@@ -25,7 +25,7 @@ export function BlogSection() {
           </Link>
         </Button>
       </div>
-      <div className="mt-10 grid gap-6 lg:grid-cols-3">
+      <div className="mt-10 grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
         {blogPosts.map((post, index) => (
           <motion.article
             key={post.id}

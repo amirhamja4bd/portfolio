@@ -21,6 +21,7 @@ const channelIconMap = {
 const schema = z.object({
   name: z.string().min(2, "Introduce yourself"),
   email: z.string().email("Share a valid email"),
+  subject: z.string().optional(),
   message: z.string().min(10, "Tell me more about what you need"),
 });
 
@@ -36,6 +37,7 @@ export function ContactSection() {
     defaultValues: {
       name: "",
       email: "",
+      subject: "",
       message: "",
     },
   });
@@ -45,10 +47,21 @@ export function ContactSection() {
     setErrorMessage(null);
 
     try {
+      // Fetch the public IP address
+      const ipResponse = await fetch("https://api.ipify.org?format=json");
+      const ipData = await ipResponse.json();
+      const ipAddress = ipData.ip;
+
+      const payload = {
+        ...values,
+        userAgent: navigator.userAgent,
+        ipAddress: ipAddress || null,
+      };
+
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -158,6 +171,19 @@ export function ContactSection() {
                 {form.formState.errors.email.message}
               </p>
             ) : null}
+          </div>
+          <div className="grid gap-2">
+            <label
+              htmlFor="subject"
+              className="text-sm font-medium text-foreground"
+            >
+              Subject
+            </label>
+            <Input
+              id="subject"
+              placeholder="What's this about?"
+              {...form.register("subject")}
+            />
           </div>
           <div className="grid gap-2">
             <label

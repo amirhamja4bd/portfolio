@@ -4,12 +4,10 @@ export interface IContact extends Document {
   name: string;
   email: string;
   message: string;
+  subject?: string;
   status: "unread" | "read" | "replied" | "archived";
   ipAddress?: string;
   userAgent?: string;
-  replied: boolean;
-  replyMessage?: string;
-  repliedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -36,6 +34,11 @@ const ContactSchema = new Schema<IContact>(
       minlength: [10, "Message must be at least 10 characters"],
       maxlength: [2000, "Message cannot exceed 2000 characters"],
     },
+    subject: {
+      type: String,
+      trim: true,
+      maxlength: [200, "Subject cannot exceed 200 characters"],
+    },
     status: {
       type: String,
       enum: ["unread", "read", "replied", "archived"],
@@ -48,17 +51,6 @@ const ContactSchema = new Schema<IContact>(
     userAgent: {
       type: String,
       trim: true,
-    },
-    replied: {
-      type: Boolean,
-      default: false,
-    },
-    replyMessage: {
-      type: String,
-      trim: true,
-    },
-    repliedAt: {
-      type: Date,
     },
   },
   {

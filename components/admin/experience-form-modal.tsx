@@ -11,7 +11,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -21,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { experienceApi } from "@/lib/api-client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -34,14 +33,17 @@ const experienceFormSchema = z.object({
     .optional()
     .or(z.literal("")),
   position: z.string().min(1, "Position is required"),
-  location: z.string().min(1, "Location is required"),
+  location: z.string().optional(),
   startDate: z.string().min(1, "Start date is required"),
   endDate: z.string().optional(),
   current: z.boolean().optional(),
-  description: z.string().min(1, "Description is required"),
-  responsibilities: z.string().optional(),
-  achievements: z.string().optional(),
-  technologies: z.string().optional(),
+  description: z.string().optional(),
+  responsibilities: z
+    .array(z.string().min(1, "Responsibility cannot be empty"))
+    .optional(),
+  technologies: z
+    .array(z.string().min(1, "Technology cannot be empty"))
+    .optional(),
   isActive: z.boolean().optional(),
 });
 
@@ -75,9 +77,8 @@ export function ExperienceFormModal({
       endDate: "",
       current: false,
       description: "",
-      responsibilities: "",
-      achievements: "",
-      technologies: "",
+      responsibilities: [],
+      technologies: [],
       isActive: true,
     },
   });
@@ -100,9 +101,8 @@ export function ExperienceFormModal({
         endDate,
         current: experience.current || false,
         description: experience.description || "",
-        responsibilities: experience.responsibilities?.join("\n") || "",
-        achievements: experience.achievements?.join("\n") || "",
-        technologies: experience.technologies?.join(", ") || "",
+        responsibilities: experience.responsibilities || [],
+        technologies: experience.technologies || [],
         isActive: experience.isActive !== false,
       });
       setIsCurrent(experience.current || false);
@@ -116,9 +116,8 @@ export function ExperienceFormModal({
         endDate: "",
         current: false,
         description: "",
-        responsibilities: "",
-        achievements: "",
-        technologies: "",
+        responsibilities: [],
+        technologies: [],
         isActive: true,
       });
       setIsCurrent(false);
@@ -131,24 +130,8 @@ export function ExperienceFormModal({
 
       const payload = {
         ...data,
-        responsibilities: data.responsibilities
-          ? data.responsibilities
-              .split("\n")
-              .map((r) => r.trim())
-              .filter(Boolean)
-          : [],
-        achievements: data.achievements
-          ? data.achievements
-              .split("\n")
-              .map((a) => a.trim())
-              .filter(Boolean)
-          : [],
-        technologies: data.technologies
-          ? data.technologies
-              .split(",")
-              .map((t) => t.trim())
-              .filter(Boolean)
-          : [],
+        responsibilities: data.responsibilities || [],
+        technologies: data.technologies || [],
       };
 
       if (isEditing) {
@@ -237,7 +220,7 @@ export function ExperienceFormModal({
                 name="location"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Location *</FormLabel>
+                    <FormLabel>Location</FormLabel>
                     <FormControl>
                       <Input placeholder="City, Country" {...field} />
                     </FormControl>
@@ -305,7 +288,7 @@ export function ExperienceFormModal({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description *</FormLabel>
+                  <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Brief overview of your role"
@@ -324,37 +307,54 @@ export function ExperienceFormModal({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Key Responsibilities</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="One responsibility per line"
-                      rows={4}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Enter each responsibility on a new line
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="achievements"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Achievements</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="One achievement per line"
-                      rows={4}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Enter each achievement on a new line
-                  </FormDescription>
+                  <div className="space-y-2">
+                    {field.value?.map(
+                      (responsibility: string, index: number) => (
+                        <div key={index} className="flex gap-2">
+                          <Input
+                            placeholder="Enter responsibility"
+                            value={responsibility}
+                            onChange={(e) => {
+                              const newResponsibilities = [
+                                ...(field.value || []),
+                              ];
+                              newResponsibilities[index] = e.target.value;
+                              field.onChange(newResponsibilities);
+                            }}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const newResponsibilities = [
+                                ...(field.value || []),
+                              ];
+                              newResponsibilities.splice(index, 1);
+                              field.onChange(newResponsibilities);
+                            }}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      )
+                    )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newResponsibilities = [
+                          ...(field.value || []),
+                          "",
+                        ];
+                        field.onChange(newResponsibilities);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Responsibility
+                    </Button>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -366,13 +366,45 @@ export function ExperienceFormModal({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Technologies Used</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="React, Node.js, MongoDB, AWS"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>Comma-separated list</FormDescription>
+                  <div className="space-y-2">
+                    {field.value?.map((technology: string, index: number) => (
+                      <div key={index} className="flex gap-2">
+                        <Input
+                          placeholder="Enter technology"
+                          value={technology}
+                          onChange={(e) => {
+                            const newTechnologies = [...(field.value || [])];
+                            newTechnologies[index] = e.target.value;
+                            field.onChange(newTechnologies);
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const newTechnologies = [...(field.value || [])];
+                            newTechnologies.splice(index, 1);
+                            field.onChange(newTechnologies);
+                          }}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newTechnologies = [...(field.value || []), ""];
+                        field.onChange(newTechnologies);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Technology
+                    </Button>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}

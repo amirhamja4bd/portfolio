@@ -52,13 +52,6 @@ async function updateContactHandler(
     contact.status = body.status;
   }
 
-  if (body.replyMessage) {
-    contact.replyMessage = body.replyMessage;
-    contact.replied = true;
-    contact.repliedAt = new Date();
-    contact.status = "replied";
-  }
-
   await contact.save();
 
   return apiResponse(contact, 200, "Contact message updated successfully");
