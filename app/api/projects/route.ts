@@ -74,14 +74,13 @@ async function createProjectHandler(
   // Validate required fields
   if (
     !body.title ||
-    !body.summary ||
     !body.description ||
     !body.technologies ||
     !body.category ||
-    !body.image
+    !body.thumbnail
   ) {
     return apiError(
-      "Title, summary, description, technologies, category, and image are required",
+      "Title, description, technologies, category, and thumbnail are required",
       400
     );
   }

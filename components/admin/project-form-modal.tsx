@@ -1,5 +1,7 @@
 "use client";
 
+import Editor from "@/components/editor/editor";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,7 +13,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -25,19 +26,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { projectApi } from "@/lib/api-client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { JSONContent } from "@tiptap/core";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import * as z from "zod";
 
 const projectFormSchema = z.object({
   title: z.string().min(1, "Title is required").max(200),
-  summary: z.string().min(1, "Summary is required").max(300),
   description: z.string().min(1, "Description is required"),
-  technologies: z.string().min(1, "At least one technology is required"),
+  technologies: z
+    .array(z.string().min(1, "Technology cannot be empty"))
+    .min(1, "At least one technology is required"),
   category: z.enum([
     "Web Application",
     "Mobile App",
@@ -47,12 +49,22 @@ const projectFormSchema = z.object({
     "Platform",
     "Other",
   ]),
-  image: z
+  thumbnail: z
     .string()
     .url("Must be a valid URL")
-    .min(1, "Project image is required"),
-  githubUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+    .min(1, "Project thumbnail is required"),
+  images: z.array(z.string().url("Must be a valid URL")).optional(),
+  videos: z.array(z.string().url("Must be a valid URL")).optional(),
+  githubUrls: z
+    .array(
+      z.object({
+        label: z.string().min(1, "Label is required"),
+        url: z.string().url("Must be a valid URL"),
+      })
+    )
+    .optional(),
   demoUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  order: z.number().optional(),
   featured: z.boolean().optional(),
   published: z.boolean().optional(),
 });
@@ -73,53 +85,177 @@ export function ProjectFormModal({
   onSuccess,
 }: ProjectFormModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentTech, setCurrentTech] = useState("");
+  const [currentGithubLabel, setCurrentGithubLabel] = useState("");
+  const [currentGithubUrl, setCurrentGithubUrl] = useState("");
+  const [currentVideo, setCurrentVideo] = useState("");
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [imageFiles, setImageFiles] = useState<FileList | null>(null);
+  const [thumbnailUrl, setThumbnailUrl] = useState("");
+  const [imagesUrls, setImagesUrls] = useState<string[]>([]);
   const isEditing = !!project;
 
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(projectFormSchema),
     defaultValues: {
       title: "",
-      summary: "",
       description: "",
-      technologies: "",
+      technologies: [],
       category: "Web Application",
-      image: "",
-      githubUrl: "",
+      thumbnail: "",
+      images: [],
+      videos: [],
+      githubUrls: [],
       demoUrl: "",
+      order: 0,
       featured: false,
       published: true,
     },
+  });
+
+  const {
+    fields: githubFields,
+    append: appendGithub,
+    remove: removeGithub,
+  } = useFieldArray({
+    control: form.control,
+    name: "githubUrls",
+  });
+
+  const {
+    fields: techFields,
+    append: appendTech,
+    remove: removeTech,
+  } = useFieldArray({
+    control: form.control as any,
+    name: "technologies",
+  });
+
+  const {
+    fields: imageFields,
+    append: appendImage,
+    remove: removeImage,
+  } = useFieldArray({
+    control: form.control as any,
+    name: "images",
+  });
+
+  const {
+    fields: videoFields,
+    append: appendVideo,
+    remove: removeVideo,
+  } = useFieldArray({
+    control: form.control as any,
+    name: "videos",
   });
 
   useEffect(() => {
     if (project) {
       form.reset({
         title: project.title || "",
-        summary: project.summary || "",
         description: project.description || "",
-        technologies: project.technologies?.join(", ") || "",
+        technologies: project.technologies || [],
         category: project.category || "Web Application",
-        image: project.image || "",
-        githubUrl: project.githubUrl || "",
+        thumbnail: project.thumbnail || "",
+        images: project.images || [],
+        videos: project.videos || [],
+        githubUrls: project.githubUrls || [],
         demoUrl: project.demoUrl || "",
+        order: project.order || 0,
         featured: project.featured || false,
         published: project.published !== false,
       });
+      setThumbnailUrl(project.thumbnail || "");
+      setImagesUrls(project.images || []);
     } else {
       form.reset({
         title: "",
-        summary: "",
         description: "",
-        technologies: "",
+        technologies: [],
         category: "Web Application",
-        image: "",
-        githubUrl: "",
+        thumbnail: "",
+        images: [],
+        videos: [],
+        githubUrls: [],
         demoUrl: "",
+        order: 0,
         featured: false,
         published: true,
       });
+      setThumbnailUrl("");
+      setImagesUrls([]);
     }
   }, [project, form]);
+
+  const handleAddTech = () => {
+    if (currentTech.trim()) {
+      (appendTech as any)(currentTech.trim());
+      setCurrentTech("");
+    }
+  };
+
+  const handleAddGithub = () => {
+    if (currentGithubLabel.trim() && currentGithubUrl.trim()) {
+      appendGithub({
+        label: currentGithubLabel.trim(),
+        url: currentGithubUrl.trim(),
+      });
+      setCurrentGithubLabel("");
+      setCurrentGithubUrl("");
+    }
+  };
+
+  const handleAddVideo = () => {
+    if (currentVideo.trim()) {
+      (appendVideo as any)(currentVideo.trim());
+      setCurrentVideo("");
+    }
+  };
+
+  const uploadFile = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+    const data = await response.json();
+    return data.url;
+  };
+
+  const handleThumbnailChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setThumbnailFile(file);
+      try {
+        const url = await uploadFile(file);
+        setThumbnailUrl(url);
+        form.setValue("thumbnail", url);
+      } catch (error) {
+        console.error("Upload failed", error);
+      }
+    }
+  };
+
+  const handleImagesChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      setImageFiles(files);
+      const urls: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        try {
+          const url = await uploadFile(files[i]);
+          urls.push(url);
+        } catch (error) {
+          console.error("Upload failed", error);
+        }
+      }
+      setImagesUrls((prev) => [...prev, ...urls]);
+      urls.forEach((url) => (appendImage as any)(url));
+    }
+  };
 
   const onSubmit = async (data: ProjectFormValues) => {
     try {
@@ -127,10 +263,7 @@ export function ProjectFormModal({
 
       const payload = {
         ...data,
-        technologies: data.technologies
-          .split(",")
-          .map((tech) => tech.trim())
-          .filter(Boolean),
+        githubUrls: data.githubUrls || [],
       };
 
       if (isEditing) {
@@ -151,7 +284,7 @@ export function ProjectFormModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {isEditing ? "Edit Project" : "Create Project"}
@@ -181,36 +314,36 @@ export function ProjectFormModal({
 
             <FormField
               control={form.control}
-              name="summary"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Summary *</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Brief summary of the project"
-                      rows={2}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    A short description (max 300 characters)
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Description *</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Detailed description of the project"
-                      rows={4}
-                      {...field}
+                    <Editor
+                      initialValue={
+                        field.value
+                          ? {
+                              type: "doc",
+                              content: [
+                                {
+                                  type: "paragraph",
+                                  content: field.value
+                                    ? [
+                                        {
+                                          type: "text",
+                                          text: field.value.replace(
+                                            /<[^>]*>/g,
+                                            ""
+                                          ),
+                                        },
+                                      ]
+                                    : [],
+                                },
+                              ],
+                            }
+                          : undefined
+                      }
+                      onChange={(content) => field.onChange(content)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -218,65 +351,216 @@ export function ProjectFormModal({
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Category *</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="Web Application">
-                          Web Application
-                        </SelectItem>
-                        <SelectItem value="Mobile App">Mobile App</SelectItem>
-                        <SelectItem value="API">API</SelectItem>
-                        <SelectItem value="Tool">Tool</SelectItem>
-                        <SelectItem value="Library">Library</SelectItem>
-                        <SelectItem value="Platform">Platform</SelectItem>
-                        <SelectItem value="Other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="technologies"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Technologies *</FormLabel>
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category *</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
-                      <Input placeholder="React, Node.js, MongoDB" {...field} />
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
                     </FormControl>
-                    <FormDescription>Comma-separated</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                    <SelectContent>
+                      <SelectItem value="Web Application">
+                        Web Application
+                      </SelectItem>
+                      <SelectItem value="Mobile App">Mobile App</SelectItem>
+                      <SelectItem value="API">API</SelectItem>
+                      <SelectItem value="Tool">Tool</SelectItem>
+                      <SelectItem value="Library">Library</SelectItem>
+                      <SelectItem value="Platform">Platform</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="space-y-4">
+              <FormLabel>Technologies *</FormLabel>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="e.g., React"
+                  value={currentTech}
+                  onChange={(e) => setCurrentTech(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleAddTech()}
+                />
+                <Button type="button" onClick={handleAddTech}>
+                  Add
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {techFields.map((field, index) => (
+                  <Badge
+                    key={field.id}
+                    variant="secondary"
+                    className="flex items-center gap-1"
+                  >
+                    {form.watch(`technologies.${index}`)}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeTech(index)}
+                      className="h-4 w-4 p-0 hover:bg-destructive hover:text-destructive-foreground"
+                    >
+                      ×
+                    </Button>
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <FormLabel>Project Thumbnail *</FormLabel>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleThumbnailChange}
               />
+              {thumbnailUrl && (
+                <img
+                  src={thumbnailUrl}
+                  alt="Thumbnail preview"
+                  className="w-32 h-32 object-cover rounded"
+                />
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <FormLabel>Additional Images</FormLabel>
+              <Input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImagesChange}
+              />
+              <div className="flex flex-wrap gap-2">
+                {imageFields.map((field, index) => (
+                  <div key={field.id} className="relative">
+                    <img
+                      src={imagesUrls[index]}
+                      alt={`Image ${index + 1}`}
+                      className="w-20 h-20 object-cover rounded"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => {
+                        removeImage(index);
+                        setImagesUrls((prev) =>
+                          prev.filter((_, i) => i !== index)
+                        );
+                      }}
+                      className="absolute -top-2 -right-2 h-6 w-6 p-0"
+                    >
+                      ×
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <FormLabel>GitHub URLs</FormLabel>
+              <div className="flex gap-2 flex-col sm:flex-row">
+                <Input
+                  placeholder="Label (e.g., Frontend)"
+                  value={currentGithubLabel}
+                  onChange={(e) => setCurrentGithubLabel(e.target.value)}
+                />
+                <Input
+                  type="url"
+                  placeholder="https://github.com/..."
+                  value={currentGithubUrl}
+                  onChange={(e) => setCurrentGithubUrl(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleAddGithub()}
+                />
+                <Button
+                  type="button"
+                  onClick={handleAddGithub}
+                  className="self-start sm:self-center"
+                >
+                  Add
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {githubFields.map((field, index) => (
+                  <Badge
+                    key={field.id}
+                    variant="secondary"
+                    className="flex items-center gap-1"
+                  >
+                    {form.watch(`githubUrls.${index}.label`)}:{" "}
+                    {form.watch(`githubUrls.${index}.url`)}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeGithub(index)}
+                      className="h-4 w-4 p-0 hover:bg-destructive hover:text-destructive-foreground"
+                    >
+                      ×
+                    </Button>
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <FormLabel>Video Links</FormLabel>
+              <div className="flex gap-2">
+                <Input
+                  type="url"
+                  placeholder="https://youtube.com/..."
+                  value={currentVideo}
+                  onChange={(e) => setCurrentVideo(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleAddVideo()}
+                />
+                <Button type="button" onClick={handleAddVideo}>
+                  Add
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {videoFields.map((field, index) => (
+                  <Badge
+                    key={field.id}
+                    variant="secondary"
+                    className="flex items-center gap-1"
+                  >
+                    {form.watch(`videos.${index}`)}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeVideo(index)}
+                      className="h-4 w-4 p-0 hover:bg-destructive hover:text-destructive-foreground"
+                    >
+                      ×
+                    </Button>
+                  </Badge>
+                ))}
+              </div>
             </div>
 
             <FormField
               control={form.control}
-              name="image"
+              name="demoUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Project Image URL *</FormLabel>
+                  <FormLabel>Demo URL</FormLabel>
                   <FormControl>
                     <Input
                       type="url"
-                      placeholder="https://example.com/image.jpg"
+                      placeholder="https://demo.example.com"
                       {...field}
                     />
                   </FormControl>
@@ -285,43 +569,26 @@ export function ProjectFormModal({
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="githubUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>GitHub URL</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="url"
-                        placeholder="https://github.com/..."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="demoUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Demo URL</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="url"
-                        placeholder="https://demo.example.com"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="order"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Order</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="0"
+                      {...field}
+                      onChange={(e) =>
+                        field.onChange(parseInt(e.target.value) || 0)
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <div className="flex gap-6">
               <FormField

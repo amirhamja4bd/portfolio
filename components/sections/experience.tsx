@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 import { experienceApi } from "@/lib/api-client";
+import ExperienceSkeleton from "../skeleton/ExperienceSkeleton";
 
 interface ExperienceItem {
   _id: string;
@@ -62,20 +63,7 @@ export function ExperienceSection() {
   };
 
   if (loading) {
-    return (
-      <section id="experience" className="scroll-mt-24">
-        <div className="space-y-4">
-          <h2 className="text-3xl font-semibold lg:text-4xl">Experience</h2>
-          <p className="max-w-2xl text-muted-foreground">
-            A timeline of the teams, products, and outcomes I&apos;ve helped
-            shape across platform, data, and developer experience.
-          </p>
-        </div>
-        <div className="mt-12 flex items-center justify-center py-12">
-          <div className="text-muted-foreground">Loading experiences...</div>
-        </div>
-      </section>
-    );
+    return <ExperienceSkeleton />;
   }
 
   if (error) {

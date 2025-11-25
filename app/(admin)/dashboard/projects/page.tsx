@@ -1,6 +1,5 @@
 "use client";
 
-
 import { ProjectFormModal } from "@/components/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -146,13 +145,11 @@ export default function ProjectsPage() {
                 key={project._id}
                 className="group rounded-xl border bg-card p-4 hover:shadow-lg transition-all"
               >
-                {project.image && (
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-40 object-cover rounded-lg mb-3"
-                  />
-                )}
+                <img
+                  src={project.thumbnail}
+                  alt={project.title}
+                  className="w-full h-40 object-cover rounded-lg mb-3"
+                />
                 <h3 className="font-semibold text-lg mb-2">{project.title}</h3>
                 <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
                   {project.summary}

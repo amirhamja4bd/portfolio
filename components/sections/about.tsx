@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import AboutSkeleton from "../skeleton/AboutSkeleton";
 
 type TabType = "snapshot" | "education" | "certifications" | "interests";
 
@@ -186,13 +187,7 @@ export function AboutSection() {
   }, []);
 
   if (isLoading) {
-    return (
-      <section id="about" className="relative scroll-mt-24">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-pulse text-muted-foreground">Loading...</div>
-        </div>
-      </section>
-    );
+    return <AboutSkeleton />;
   }
 
   return (

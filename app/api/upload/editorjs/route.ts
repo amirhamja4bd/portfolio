@@ -1,10 +1,5 @@
-import {
-  apiError,
-  apiResponse,
-  withAuth,
-  withErrorHandling,
-} from "@/lib/api-helpers";
-import { NextRequest } from "next/server";
+import { apiError, withAuth, withErrorHandling } from "@/lib/api-helpers";
+import { NextRequest, NextResponse } from "next/server";
 
 /**
  * Upload image using Editor.js image tool format
@@ -45,24 +40,24 @@ async function uploadEditorJSHandler(
       return apiError(result.message, uploadResponse.status);
     }
 
-    // Return in Editor.js format
-    return apiResponse(
+    // Return in Editor.js format (raw) to satisfy Editor.js expectations
+    return NextResponse.json(
       {
         success: 1,
         file: {
           url: result.data.url,
         },
       },
-      200
+      { status: 200 }
     );
   } catch (error: any) {
     console.error("Editor.js upload error:", error);
-    return apiResponse(
+    return NextResponse.json(
       {
         success: 0,
         message: error.message || "Failed to upload image",
       },
-      500
+      { status: 500 }
     );
   }
 }

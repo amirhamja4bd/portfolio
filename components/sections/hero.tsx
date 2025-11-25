@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { HeroData } from "@/types/hero";
+import HeroSkeleton from "../skeleton/HeroSkeleton";
 
 // Icon mapping for social links
 const iconMap = {
@@ -50,8 +51,7 @@ export function HeroSection() {
 
   // Loading state
   if (isLoading) {
-    return "Loading...";
-    // return <HeroSkeleton />;
+    return <HeroSkeleton />;
   }
 
   // Error state

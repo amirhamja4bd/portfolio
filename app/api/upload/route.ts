@@ -1,11 +1,6 @@
-import {
-  apiError,
-  apiResponse,
-  withAuth,
-  withErrorHandling,
-} from "@/lib/api-helpers";
+import { apiError, apiResponse, withErrorHandling } from "@/lib/api-helpers";
 import { existsSync } from "fs";
-import { mkdir, writeFile } from "fs/promises";
+import { mkdir, unlink, writeFile } from "fs/promises";
 import { NextRequest } from "next/server";
 import path from "path";
 
@@ -84,4 +79,33 @@ async function uploadHandler(request: NextRequest, { user }: { user: any }) {
 }
 
 // POST /api/upload - Upload an image file (Temporarily removed auth for testing)
+// Delete uploaded file by url
+async function deleteHandler(request: NextRequest, { user }: { user: any }) {
+  try {
+    const body = await request.json();
+    const url = body?.url as string;
+    if (!url) return apiError("No url provided", 400);
+    // Ensure path is within /uploads
+    if (!url.startsWith("/uploads/")) {
+      return apiError("Invalid url path", 400);
+    }
+
+    const localPath = path.join(
+      process.cwd(),
+      "public",
+      url.replace(/^[\/]+/, "")
+    );
+    if (!existsSync(localPath)) {
+      return apiError("File not found", 404);
+    }
+
+    await unlink(localPath);
+    return apiResponse({ url }, 200, "File deleted successfully");
+  } catch (error: any) {
+    console.error("Failed to delete file:", error);
+    return apiError(error?.message || "Failed to delete file", 500);
+  }
+}
+
 export const POST = withErrorHandling(uploadHandler);
+export const DELETE = withErrorHandling(deleteHandler);

@@ -12,8 +12,14 @@ import { useEffect, useRef } from "react";
 // @ts-ignore
 const Embed = require("@editorjs/embed");
 
-export default function Editorjs() {
-  const ejInstance = useRef<EditorJS | null>(null);
+interface EditorjsProps {
+  initialValue?: any;
+  onChange?: (content: string) => void;
+}
+
+export default function Editorjs({ initialValue, onChange }: EditorjsProps) {
+  // Use any because the actual runtime SDK might be wrapped by bundlers in some envs
+  const ejInstance = useRef<any | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
 
@@ -23,6 +29,7 @@ export default function Editorjs() {
     ejInstance.current = new EditorJS({
       holder: editorRef.current,
       autofocus: true,
+      data: initialValue,
       tools: {
         header: Header,
         list: List,
@@ -30,8 +37,10 @@ export default function Editorjs() {
           class: ImageTool,
           config: {
             endpoints: {
-              byFile: "/api/upload-image", // You must implement this endpoint
-              byUrl: "/api/fetch-image", // You must implement this endpoint
+              // Use the Editor.js-friendly endpoint that forwards to our generic /api/upload
+              byFile: "/api/upload/editorjs",
+              // Fetch remote images (we implement /api/upload/fetch-image)
+              byUrl: "/api/upload/fetch-image",
             },
             captionPlaceholder: "Image caption...",
           },
@@ -58,20 +67,48 @@ export default function Editorjs() {
         // Editor is ready
       },
       onChange: async () => {
-        // You can handle change events here
+        // Try to save and send the content upwards on change
+        try {
+          const inst = ejInstance.current as any;
+          if (inst && typeof inst.save === "function") {
+            const out = await inst.save();
+            onChange?.(JSON.stringify(out));
+          }
+        } catch (err) {
+          // ignore save errors on frequent changes
+          console.warn("EditorJS onChange save error:", err);
+        }
       },
       // Error handling for Editor.js can be done via try/catch in save or block config
     });
     return () => {
-      ejInstance.current?.destroy();
+      if (ejInstance.current) {
+        const inst = ejInstance.current as any;
+        if (typeof inst.destroy === "function") {
+          try {
+            inst.destroy();
+          } catch (err) {
+            console.warn("EditorJS destroy threw:", err);
+          }
+        } else {
+          // Not a function or not present — log to help debugging
+          console.warn("EditorJS instance has no destroy method:", inst);
+        }
+      }
       ejInstance.current = null;
     };
   }, [theme]);
 
   const handleSave = async () => {
     if (ejInstance.current) {
-      const outputData = await ejInstance.current.save();
-      alert(JSON.stringify(outputData, null, 2));
+      const inst = ejInstance.current as any;
+      if (typeof inst.save === "function") {
+        const outputData = await inst.save();
+        onChange?.(JSON.stringify(outputData));
+        alert(JSON.stringify(outputData, null, 2));
+      } else {
+        console.warn("EditorJS instance has no save method.");
+      }
     }
   };
 

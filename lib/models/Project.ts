@@ -3,14 +3,15 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 export interface IProject extends Document {
   title: string;
   slug: string;
-  summary: string;
   description: string;
-  details?: string;
   technologies: string[];
   category: string;
-  image: string;
+  thumbnail: string;
   images?: string[];
-  githubUrl?: string;
+  githubUrls?: {
+    label: string;
+    url: string;
+  }[];
   demoUrl?: string;
   featured: boolean;
   published: boolean;
@@ -24,6 +25,7 @@ export interface IProject extends Document {
   results?: string;
   createdAt: Date;
   updatedAt: Date;
+  videos?: string[];
 }
 
 const ProjectSchema = new Schema<IProject>(
@@ -45,19 +47,9 @@ const ProjectSchema = new Schema<IProject>(
         "Slug must contain only lowercase letters, numbers, and hyphens",
       ],
     },
-    summary: {
-      type: String,
-      required: [true, "Summary is required"],
-      trim: true,
-      maxlength: [300, "Summary cannot exceed 300 characters"],
-    },
     description: {
       type: String,
       required: [true, "Description is required"],
-      trim: true,
-    },
-    details: {
-      type: String,
       trim: true,
     },
     technologies: {
@@ -84,19 +76,31 @@ const ProjectSchema = new Schema<IProject>(
         "Other",
       ],
     },
-    image: {
+    thumbnail: {
       type: String,
-      required: [true, "Project image is required"],
+      required: [true, "Project thumbnail is required"],
       trim: true,
     },
     images: {
       type: [String],
       default: [],
     },
-    githubUrl: {
-      type: String,
-      trim: true,
-      match: [/^https?:\/\//, "Please provide a valid URL"],
+    videos: {
+      type: [String],
+      default: [],
+    },
+    githubUrls: {
+      type: [
+        {
+          label: { type: String, required: true },
+          url: {
+            type: String,
+            required: true,
+            match: [/^https?:\/\//, "Please provide a valid URL"],
+          },
+        },
+      ],
+      default: [],
     },
     demoUrl: {
       type: String,
@@ -115,15 +119,27 @@ const ProjectSchema = new Schema<IProject>(
       type: Number,
       default: 0,
     },
-    metrics: [
-      {
-        label: String,
-        value: String,
-      },
-    ],
-    challenges: String,
-    solutions: String,
-    results: String,
+    metrics: {
+      type: [
+        {
+          label: { type: String, required: true },
+          value: { type: String, required: true },
+        },
+      ],
+      default: [],
+    },
+    challenges: {
+      type: String,
+      trim: true,
+    },
+    solutions: {
+      type: String,
+      trim: true,
+    },
+    results: {
+      type: String,
+      trim: true,
+    },
   },
   {
     timestamps: true,

@@ -7,6 +7,7 @@ import {
   GlobalDragHandle,
   HighlightExtension,
   HorizontalRule,
+  ImageResizer,
   MarkdownExtension,
   Mathematics,
   Placeholder,
@@ -21,6 +22,8 @@ import {
   UpdatedImage,
   Youtube,
 } from "novel/extensions";
+import { UploadImagesPlugin } from "novel/plugins";
+import { ImageDeletePlugin } from "./image-delete-plugin";
 
 import { cx } from "class-variance-authority";
 import { common, createLowlight } from "lowlight";
@@ -29,11 +32,13 @@ import { common, createLowlight } from "lowlight";
 const aiHighlight = AIHighlight;
 //You can overwrite the placeholder with your own configuration
 const placeholder = Placeholder.configure({
-  placeholder: "Press '/' for commands",
+  placeholder:
+    "Press '/' for commands",
   emptyEditorClass: "is-editor-empty",
   emptyNodeClass: "is-empty",
   showOnlyWhenEditable: true,
-  showOnlyCurrent: true,
+  includeChildren: true,
+  showOnlyCurrent: false,
 });
 const tiptapLink = TiptapLink.configure({
   HTMLAttributes: {
@@ -43,7 +48,15 @@ const tiptapLink = TiptapLink.configure({
   },
 });
 
-const tiptapImage = TiptapImage.configure({
+const tiptapImage = TiptapImage.extend({
+  addProseMirrorPlugins() {
+    return [
+      UploadImagesPlugin({
+        imageClass: cx("opacity-40 rounded-lg border border-stone-200"),
+      }),
+    ];
+  },
+}).configure({
   allowBase64: true,
   HTMLAttributes: {
     class: cx("rounded-lg border border-muted"),
@@ -154,6 +167,8 @@ export const defaultExtensions = [
   tiptapLink,
   tiptapImage,
   updatedImage,
+  // Enable image resizing UI
+  ImageResizer,
   taskList,
   taskItem,
   horizontalRule,
@@ -170,4 +185,6 @@ export const defaultExtensions = [
   Color,
   CustomKeymap,
   GlobalDragHandle,
+  ImageDeletePlugin,
+  // Note: UploadImagesPlugin is now attached to the TiptapImage extension
 ];

@@ -9,6 +9,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { skillApi } from "@/lib/api-client";
 import { skills } from "@/lib/content";
+import SkillsSkeleton from "../skeleton/SkillsSkeleton";
 
 type CategoryType =
   | "all"
@@ -146,11 +147,7 @@ export function SkillsSection() {
 
       {/* Skills Grid with AnimatePresence */}
       <div className="mt-8">
-        {loading && (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-muted-foreground">Loading skills...</div>
-          </div>
-        )}
+        {loading && <SkillsSkeleton />}
 
         {error && (
           <div className="flex items-center justify-center py-12">

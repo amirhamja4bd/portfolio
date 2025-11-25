@@ -15,39 +15,9 @@ import {
 // Import highlight.js CSS theme
 import "highlight.js/styles/github-dark.css";
 
-// Stub implementations for novel extensions/plugins
-const ImageResizer = () => null; // Placeholder component
-const handleCommandNavigation = (event: KeyboardEvent) => {
-  // Basic command navigation handling
-  return false;
-};
-const handleImageDrop = (
-  view: any,
-  event: DragEvent,
-  moved: boolean,
-  uploadFn: any
-) => {
-  const files = event.dataTransfer?.files;
-  if (files && files.length > 0) {
-    const file = files[0];
-    if (file.type.includes("image/")) {
-      uploadFn(file, view, view.state.selection.from);
-      return true;
-    }
-  }
-  return false;
-};
-const handleImagePaste = (view: any, event: ClipboardEvent, uploadFn: any) => {
-  const files = event.clipboardData?.files;
-  if (files && files.length > 0) {
-    const file = files[0];
-    if (file.type.includes("image/")) {
-      uploadFn(file, view, view.state.selection.from);
-      return true;
-    }
-  }
-  return false;
-};
+// Use novel-provided extensions/plugins for better behavior
+import { ImageResizer, handleCommandNavigation } from "novel/extensions";
+import { handleImageDrop, handleImagePaste } from "novel/plugins";
 
 import EditorMenu from "@/components/editor/editor-menu";
 import { defaultExtensions } from "@/components/editor/extensions";
@@ -66,7 +36,7 @@ import { Separator } from "@/components/ui/separator";
 
 const hljs = require("highlight.js");
 
-const extensions = [...defaultExtensions, slashCommand];
+const extensions = [...defaultExtensions, slashCommand] as any;
 
 export const defaultEditorContent = {
   type: "doc",
@@ -104,7 +74,7 @@ export default function Editor({ initialValue, onChange }: EditorProps) {
         <EditorContent
           initialContent={initialValue}
           extensions={extensions}
-          className="min-h-96 rounded-xl border p-4 dark:bg-input/10 [&_.is-editor-empty:before]:text-muted-foreground [&_.is-editor-empty:before]:float-left [&_.is-editor-empty:before]:h-0 [&_.is-editor-empty:before]:pointer-events-none [&_.is-editor-empty:before]:content-[attr(data-placeholder)]"
+          className="min-h-96 rounded-xl border p-4 dark:bg-input/10 [&_.is-editor-empty:before]:text-muted-foreground [&_.is-editor-empty:before]:float-left [&_.is-editor-empty:before]:h-0 [&_.is-editor-empty:before]:pointer-events-none [&_.is-editor-empty:before]:content-[attr(data-placeholder)] [&_.is-empty:before]:text-muted-foreground [&_.is-empty:before]:float-left [&_.is-empty:before]:h-0 [&_.is-empty:before]:pointer-events-none [&_.is-empty:before]:content-[attr(data-placeholder)]"
           editorProps={{
             handleDOMEvents: {
               keydown: (_view, event) => handleCommandNavigation(event),
@@ -122,6 +92,31 @@ export default function Editor({ initialValue, onChange }: EditorProps) {
             const html = editor.getHTML();
             const highlightedHtml = highlightCodeblocks(html);
             onChange(highlightedHtml);
+
+            // If the document ends with an image, insert a trailing paragraph so users can type below the image.
+            try {
+              const { doc } = editor.state;
+              const last = doc.lastChild;
+              if (last?.type?.name === "image") {
+                const docSize = doc.content.size;
+                // Only insert paragraph when doc actually ends with image (prevents duplication)
+                // `insertContentAt` with a paragraph will add a new node at the end.
+                editor
+                  .chain()
+                  .focus()
+                  .insertContentAt(docSize, [{ type: "paragraph" }])
+                  .run();
+                // Place the cursor inside the new paragraph
+                editor
+                  .chain()
+                  .focus()
+                  .setTextSelection(docSize + 1)
+                  .run();
+              }
+            } catch (err) {
+              // ignore any errors, but log for debugging
+              console.debug("Could not ensure trailing paragraph", err);
+            }
           }}
           slotAfter={<ImageResizer />}
         >
