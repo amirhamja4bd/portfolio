@@ -1,21 +1,31 @@
 "use client";
 
-import { ProjectFormModal } from "@/components/admin";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRequireAuth } from "@/contexts/auth-context";
 import { projectApi } from "@/lib/api-client";
 import { motion } from "framer-motion";
 import { Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function ProjectsPage() {
   const { user, loading } = useRequireAuth();
   const [projects, setProjects] = useState<any[]>([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingProject, setEditingProject] = useState<any>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (user) {
@@ -36,30 +46,40 @@ export default function ProjectsPage() {
   };
 
   const handleCreate = () => {
-    setEditingProject(null);
-    setIsModalOpen(true);
+    router.push("/dashboard/projects/create");
   };
 
   const handleEdit = (project: any) => {
-    setEditingProject(project);
-    setIsModalOpen(true);
+    router.push(`/dashboard/projects/${project.slug}/edit`);
   };
 
-  const handleDelete = async (slug: string) => {
-    if (!confirm("Are you sure you want to delete this project?")) return;
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingDeleteSlug, setPendingDeleteSlug] = useState<string | null>(
+    null
+  );
 
+  const handleDelete = (slug: string) => {
+    // open confirmation dialog
+    setPendingDeleteSlug(slug);
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!pendingDeleteSlug) return;
     try {
-      await projectApi.delete(slug);
+      await projectApi.delete(pendingDeleteSlug);
+      toast.success("Project deleted");
       fetchProjects();
     } catch (error) {
       console.error("Failed to delete project:", error);
-      alert("Failed to delete project");
+      toast.error("Failed to delete project");
+    } finally {
+      setConfirmOpen(false);
+      setPendingDeleteSlug(null);
     }
   };
 
   const handleSuccess = () => {
-    setIsModalOpen(false);
-    setEditingProject(null);
     fetchProjects();
   };
 
@@ -174,7 +194,7 @@ export default function ProjectsPage() {
                     size="sm"
                     variant="outline"
                     onClick={() => handleEdit(project)}
-                    className="flex-1"
+                    className=""
                   >
                     <Pencil className="h-3 w-3 mr-1" />
                     Edit
@@ -186,6 +206,7 @@ export default function ProjectsPage() {
                     className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
                   >
                     <Trash2 className="h-3 w-3" />
+                    Delete
                   </Button>
                 </div>
               </div>
@@ -194,13 +215,28 @@ export default function ProjectsPage() {
         )}
       </motion.div>
 
-      {/* Modal */}
-      <ProjectFormModal
-        open={isModalOpen}
-        onOpenChange={setIsModalOpen}
-        project={editingProject}
-        onSuccess={handleSuccess}
-      />
+      {/* Note: using page-based create/edit instead of modal */}
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete project</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this project? This action cannot
+              be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground"
+              onClick={handleConfirmDelete}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

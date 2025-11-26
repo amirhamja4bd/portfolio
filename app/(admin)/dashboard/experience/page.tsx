@@ -1,6 +1,16 @@
 "use client";
 
 import { ExperienceFormModal } from "@/components/admin";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRequireAuth } from "@/contexts/auth-context";
@@ -8,6 +18,7 @@ import { experienceApi } from "@/lib/api-client";
 import { motion } from "framer-motion";
 import { Calendar, MapPin, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function ExperiencePage() {
   const { user, loading } = useRequireAuth();
@@ -45,15 +56,26 @@ export default function ExperiencePage() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this experience?")) return;
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
+  const handleDelete = (id: string) => {
+    setPendingDeleteId(id);
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!pendingDeleteId) return;
     try {
-      await experienceApi.delete(id);
+      await experienceApi.delete(pendingDeleteId);
+      toast.success("Experience deleted");
       fetchExperiences();
     } catch (error) {
       console.error("Failed to delete experience:", error);
-      alert("Failed to delete experience");
+      toast.error("Failed to delete experience");
+    } finally {
+      setConfirmOpen(false);
+      setPendingDeleteId(null);
     }
   };
 
@@ -240,6 +262,26 @@ export default function ExperiencePage() {
         experience={editingExperience}
         onSuccess={handleSuccess}
       />
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete experience</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this experience? This action
+              cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground"
+              onClick={handleConfirmDelete}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -9,6 +9,7 @@ import Quote from "@editorjs/quote";
 import Table from "@editorjs/table";
 import { useTheme } from "next-themes";
 import { useEffect, useRef } from "react";
+import { toast } from "sonner";
 // @ts-ignore
 const Embed = require("@editorjs/embed");
 
@@ -105,7 +106,15 @@ export default function Editorjs({ initialValue, onChange }: EditorjsProps) {
       if (typeof inst.save === "function") {
         const outputData = await inst.save();
         onChange?.(JSON.stringify(outputData));
-        alert(JSON.stringify(outputData, null, 2));
+        // Copy the JSON to clipboard and show a non-blocking toast
+        try {
+          await navigator.clipboard.writeText(
+            JSON.stringify(outputData, null, 2)
+          );
+          toast.success("Editor JSON copied to clipboard");
+        } catch (err) {
+          toast(JSON.stringify(outputData, null, 2));
+        }
       } else {
         console.warn("EditorJS instance has no save method.");
       }

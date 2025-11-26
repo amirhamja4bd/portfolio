@@ -1,6 +1,16 @@
 "use client";
 
 import { SkillFormModal } from "@/components/admin";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRequireAuth } from "@/contexts/auth-context";
@@ -9,6 +19,7 @@ import { motion } from "framer-motion";
 import * as LucideIcons from "lucide-react";
 import { Atom, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function SkillsPage() {
   const { user, loading } = useRequireAuth();
@@ -59,15 +70,26 @@ export default function SkillsPage() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this skill?")) return;
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
+  const handleDelete = (id: string) => {
+    setPendingDeleteId(id);
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!pendingDeleteId) return;
     try {
-      await skillApi.delete(id);
+      await skillApi.delete(pendingDeleteId);
+      toast.success("Skill deleted");
       fetchSkills();
     } catch (error) {
       console.error("Failed to delete skill:", error);
-      alert("Failed to delete skill");
+      toast.error("Failed to delete skill");
+    } finally {
+      setConfirmOpen(false);
+      setPendingDeleteId(null);
     }
   };
 
@@ -293,6 +315,26 @@ export default function SkillsPage() {
         skill={editingSkill}
         onSuccess={handleSuccess}
       />
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete skill</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this skill? This action cannot be
+              undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground"
+              onClick={handleConfirmDelete}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

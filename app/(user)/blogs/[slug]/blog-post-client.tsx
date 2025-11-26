@@ -17,6 +17,7 @@ import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import remarkGfm from "remark-gfm";
+import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -63,7 +64,7 @@ export default function BlogPostClient({
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(shareUrl);
-    alert("Link copied to clipboard!");
+    toast.success("Link copied to clipboard!");
   };
 
   return (

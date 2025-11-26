@@ -31,6 +31,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
 
 const skillFormSchema = z.object({
@@ -121,7 +122,7 @@ export function SkillFormModal({
       form.reset();
     } catch (error: any) {
       console.error("Failed to save skill:", error);
-      alert(error.message || "Failed to save skill");
+      toast.error(error.message || "Failed to save skill");
     } finally {
       setIsSubmitting(false);
     }

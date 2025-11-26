@@ -1,5 +1,15 @@
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRequireAuth } from "@/contexts/auth-context";
@@ -8,6 +18,7 @@ import { motion } from "framer-motion";
 import { Calendar, Eye, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function BlogsPage() {
   const router = useRouter();
@@ -42,15 +53,28 @@ export default function BlogsPage() {
     router.push(`/dashboard/blogs/form?slug=${blog.slug}`);
   };
 
-  const handleDelete = async (slug: string) => {
-    if (!confirm("Are you sure you want to delete this blog post?")) return;
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingDeleteSlug, setPendingDeleteSlug] = useState<string | null>(
+    null
+  );
 
+  const handleDelete = (slug: string) => {
+    setPendingDeleteSlug(slug);
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!pendingDeleteSlug) return;
     try {
-      await blogApi.delete(slug);
+      await blogApi.delete(pendingDeleteSlug);
+      toast.success("Blog post deleted");
       fetchBlogs();
     } catch (error) {
       console.error("Failed to delete blog:", error);
-      alert("Failed to delete blog post");
+      toast.error("Failed to delete blog post");
+    } finally {
+      setConfirmOpen(false);
+      setPendingDeleteSlug(null);
     }
   };
 
@@ -225,6 +249,26 @@ export default function BlogsPage() {
           </div>
         )}
       </motion.div>
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete blog post</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this blog post? This action cannot
+              be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground"
+              onClick={handleConfirmDelete}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

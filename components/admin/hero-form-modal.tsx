@@ -24,6 +24,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
 
 const heroFormSchema = z.object({
@@ -104,9 +105,10 @@ export function HeroFormModal({
           },
         },
         techStack: heroData.techStack?.join(", ") || "",
-        socialLinks: heroData.socialLinks
-          ?.map((link) => `${link.icon}|${link.link}|${link.title}`)
-          .join("\n") || "",
+        socialLinks:
+          heroData.socialLinks
+            ?.map((link) => `${link.icon}|${link.link}|${link.title}`)
+            .join("\n") || "",
         published: heroData.published !== false,
       });
     } else {
@@ -154,9 +156,7 @@ export function HeroFormModal({
 
       const url = "/api/hero";
       const method = isEditing ? "PUT" : "POST";
-      const body = isEditing
-        ? { id: heroData._id, ...payload }
-        : payload;
+      const body = isEditing ? { id: heroData._id, ...payload } : payload;
 
       const response = await fetch(url, {
         method,
@@ -173,7 +173,7 @@ export function HeroFormModal({
       form.reset();
     } catch (error: any) {
       console.error("Failed to save hero:", error);
-      alert(error.message || "Failed to save hero section");
+      toast.error(error.message || "Failed to save hero section");
     } finally {
       setIsSubmitting(false);
     }
@@ -338,7 +338,9 @@ export function HeroFormModal({
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>Comma-separated technologies</FormDescription>
+                  <FormDescription>
+                    Comma-separated technologies
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

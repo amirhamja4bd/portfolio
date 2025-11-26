@@ -19,6 +19,7 @@ import { Loader2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
 
 const blogFormSchema = z.object({
@@ -117,7 +118,7 @@ export default function BlogFormPage() {
         }
       } catch (error) {
         console.error("Failed to load blog:", error);
-        alert("Failed to load blog post");
+        toast.error("Failed to load blog post");
         router.push("/dashboard/blogs");
       } finally {
         setIsLoading(false);
@@ -157,7 +158,7 @@ export default function BlogFormPage() {
       router.push("/dashboard/blogs");
     } catch (error: any) {
       console.error("Save failed:", error);
-      alert(error.message || "Failed to save blog post");
+      toast.error(error.message || "Failed to save blog post");
     } finally {
       setIsSubmitting(false);
     }

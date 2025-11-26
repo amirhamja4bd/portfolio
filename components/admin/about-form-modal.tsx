@@ -22,6 +22,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
 
 const aboutFormSchema = z.object({
@@ -247,7 +248,7 @@ export function AboutFormModal({
       form.reset();
     } catch (error) {
       console.error("Error saving about:", error);
-      alert("Failed to save about section. Please try again.");
+      toast.error("Failed to save about section. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

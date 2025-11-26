@@ -3,6 +3,7 @@ import "./globals.css";
 
 import { QueryProvider } from "@/components/providers/query-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 
 const geistSans = Geist({
@@ -38,7 +39,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} relative min-h-screen overflow-x-hidden bg-background font-sans text-foreground antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            {children}
+            <Toaster />
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>
