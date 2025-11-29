@@ -31,7 +31,7 @@ pnpm add novel
 #### Updated Fields:
 
 - ✅ `slug` - Now auto-generated from title (not required on input)
-- ✅ `content` - Now stores Novel.sh JSON format (TipTap JSON)
+- ✅ `content` - Now stored as an HTML string (converted from Novel/Tiptap JSON or HTML input)
 
 #### Final Schema:
 
@@ -39,7 +39,7 @@ pnpm add novel
 {
   title: string (required)
   slug: string (auto-generated, unique)
-  content: any (Novel.sh JSON, required)
+  content: string (HTML string, required)
   tags: string[]
   thumbnail?: string
   images: string[]
@@ -172,7 +172,7 @@ useEffect(() => {
 
 - The static demo data in `lib/content.ts` still uses old schema (for demo purposes)
 - Real blog posts from MongoDB will use the new schema
-- Editor content is stored as TipTap JSON format
+- Editor content is stored on the client as TipTap JSON; the server stores HTML strings converted from that format.
 - Images are stored as URLs (consider adding upload functionality later)
 - Slug generation uses lowercase and hyphens only (`^[a-z0-9-]+$`)
 

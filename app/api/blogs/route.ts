@@ -9,6 +9,7 @@ import {
   withErrorHandling,
 } from "@/lib/api-helpers";
 import connectDB from "@/lib/db";
+import docToHtml from "@/lib/doc-to-html";
 import BlogPost from "@/lib/models/BlogPost";
 import { NextRequest } from "next/server";
 import slugify from "slugify";
@@ -18,7 +19,7 @@ async function getBlogPostsHandler(request: NextRequest) {
   await connectDB();
 
   const { page, limit, skip } = getPaginationParams(request);
-  const { search, category, tag, featured, published } =
+  const { search, category, tag, featured, published, sort } =
     getSearchParams(request);
 
   // Build query
@@ -48,7 +49,13 @@ async function getBlogPostsHandler(request: NextRequest) {
   }
 
   if (tag) {
-    query.tags = tag;
+    // Accept CSV (comma-separated tags) for multi-tag filtering (OR)
+    const tags = String(tag)
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+    if (tags.length > 1) query.tags = { $in: tags };
+    else query.tags = tags[0];
   }
 
   if (featured !== undefined) {
@@ -58,13 +65,23 @@ async function getBlogPostsHandler(request: NextRequest) {
   // Get total count
   const total = await BlogPost.countDocuments(query);
 
+  // Sort mapping: support 'latest', 'oldest', 'popular' or direct sort strings
+  let sortVal: any = "-publishedAt -createdAt";
+  if (sort === "latest") sortVal = "-publishedAt";
+  else if (sort === "oldest") sortVal = "publishedAt";
+  else if (sort === "popular") sortVal = "-viewsCount";
+  else if (sort) sortVal = sort; // allow custom sort strings
+
   // Get posts with pagination
   const posts = await BlogPost.find(query)
-    .sort({ publishedAt: -1, createdAt: -1 })
+    .sort(sortVal)
     .skip(skip)
     .limit(limit)
     .select("-content"); // Exclude full content from list view
-
+  // Ensure compatibility field `views` exists for front-end
+  posts.forEach((p: any) => {
+    p.set("views", p.get("views") || p.get("viewsCount") || 0);
+  });
   return apiResponse(paginationResponse(posts, total, page, limit), 200);
 }
 
@@ -98,13 +115,22 @@ async function createBlogPostHandler(
   // Set publishedAt if publishing
   const publishedAt = body.published ? new Date() : undefined;
 
+  // Ensure content is a string (HTML). Convert if provided as JSON doc.
+  if (body.content && typeof body.content !== "string") {
+    body.content = docToHtml(body.content as any);
+  }
+
   // Create the post
   const post = await BlogPost.create({
     ...body,
     slug,
     publishedAt,
-    views: 0,
+    viewsCount: 0,
   });
+
+  // Keep backward compatibility with `views` property used in UI
+  post.set("views", post.get("views") || post.get("viewsCount") || 0);
+  await post.save();
 
   return apiResponse(post, 201, "Blog post created successfully");
 }

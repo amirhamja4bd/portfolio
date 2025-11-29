@@ -10,7 +10,7 @@ import { useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { projectApi } from "@/lib/api-client";
-import DOMPurify from "dompurify";
+import sanitizeHtml from "@/lib/sanitizeHtml";
 
 const projectsData = {
   title: "Projects",
@@ -189,13 +189,13 @@ export function ProjectsSection() {
                 </div>
 
                 {/* Summary */}
-                <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed flex-1">
+                <div className="text-sm text-muted-foreground line-clamp-2 leading-relaxed flex-1">
                   <div
                     dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize(project.summary),
+                      __html: sanitizeHtml(project.summary),
                     }}
                   />
-                </p>
+                </div>
 
                 {/* Technologies - Ultra Compact */}
                 <div className="flex flex-wrap gap-1">

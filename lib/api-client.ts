@@ -163,9 +163,14 @@ export const blogApi = {
     search?: string;
     category?: string;
     tag?: string;
+    sort?: string;
     featured?: boolean;
     all?: boolean;
   }) => api.get("/api/blogs", params),
+
+  // Get all distinct tags
+  getTags: (params?: { all?: boolean }) =>
+    api.get<string[]>("/api/blogs/tags", params),
 
   getBySlug: (slug: string) => api.get(`/api/blogs/${slug}`),
 

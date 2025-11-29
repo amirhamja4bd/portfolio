@@ -1,14 +1,32 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { blogPosts } from "@/lib/content";
+import { blogApi } from "@/lib/api-client";
+import type { BlogPostPreview } from "@/lib/content";
 
 export function BlogSection() {
+  const {
+    data: apiResponse,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["blogPosts", { limit: 6 }],
+    queryFn: async () => (await blogApi.getAll({ limit: 6 })).data,
+    // Keep a small cache window for navigation
+    staleTime: 1000 * 30,
+    retry: 1,
+  });
+
+  // API returns: { data: { data: Post[], pagination } }
+  const posts: BlogPostPreview[] = apiResponse?.data || [];
+
   return (
     <section id="blog" className="scroll-mt-24">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -26,7 +44,7 @@ export function BlogSection() {
         </Button>
       </div>
       <div className="mt-10 grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
-        {blogPosts.map((post, index) => (
+        {(isLoading ? [] : posts).map((post, index) => (
           <motion.article
             key={post.id}
             initial={{ opacity: 0, y: 30 }}
@@ -36,7 +54,15 @@ export function BlogSection() {
             className="group flex flex-col rounded-3xl border border-border/60 bg-background/70 p-6 shadow-lg backdrop-blur"
           >
             <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-muted-foreground/70">
-              <span>{post.publishedAt}</span>
+              <span>
+                {post.publishedAt
+                  ? new Date(post.publishedAt).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })
+                  : ""}
+              </span>
               <span>{post.readingTime}</span>
             </div>
             <h3 className="mt-4 text-xl font-semibold text-foreground transition group-hover:text-emerald-400">
@@ -44,7 +70,7 @@ export function BlogSection() {
             </h3>
             <p className="mt-3 text-sm text-muted-foreground">{post.excerpt}</p>
             <div className="mt-4 flex flex-wrap gap-2 mb-1">
-              {post.tags.map((tag) => (
+              {post.tags.map((tag: string) => (
                 <Badge key={tag} variant="secondary">
                   {tag}
                 </Badge>

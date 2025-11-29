@@ -1,3 +1,4 @@
+import SplashScreen from "@/components/CodeLoader copy";
 import { AboutSection } from "@/components/sections/about";
 import { BlogSection } from "@/components/sections/blog";
 import { ContactSection } from "@/components/sections/contact";
@@ -9,7 +10,7 @@ import { SkillsSection } from "@/components/sections/skills";
 export default function Home() {
   return (
     <div className="space-y-24 lg:space-y-32">
-      {/* <SplashScreen /> */}
+      <SplashScreen />
       <HeroSection />
       <AboutSection />
       <SkillsSection />

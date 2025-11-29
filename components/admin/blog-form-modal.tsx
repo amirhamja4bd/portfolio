@@ -31,7 +31,8 @@ import { Textarea } from "@/components/ui/textarea";
 const blogFormSchema = z.object({
   title: z.string().min(1, "Title is required").max(200),
   content: z.string().optional(),
-  thumbnail: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  // Allow relative upload paths (e.g., /uploads/abc.jpg) as well as empty string
+  thumbnail: z.string().optional().or(z.literal("")),
   images: z.string().optional(), // Comma-separated URLs
   tags: z.string().optional(),
   category: z.string().min(1, "Category is required"),

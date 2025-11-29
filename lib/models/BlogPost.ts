@@ -3,7 +3,7 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 export interface IBlogPost extends Document {
   title: string;
   slug: string;
-  content: any; // Novel.sh JSON format
+  content: string; // HTML string (converted from Novel.sh JSON or raw HTML)
   tags: string[];
   thumbnail?: string;
   images: string[];
@@ -14,7 +14,14 @@ export interface IBlogPost extends Document {
   };
   published: boolean;
   featured: boolean;
-  views: number;
+  viewsCount: number;
+  reactionsCount: {
+    1: number;
+    2: number;
+    3: number;
+    4: number;
+    5: number;
+  };
   publishedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -39,17 +46,18 @@ const BlogPostSchema = new Schema<IBlogPost>(
       ],
     },
     content: {
-      type: Schema.Types.Mixed,
+      type: String,
       required: [true, "Content is required"],
+      trim: true,
     },
     tags: {
       type: [String],
       default: [],
       validate: {
         validator: function (tags: string[]) {
-          return tags.length <= 10;
+          return tags.length >= 1 && tags.length <= 20;
         },
-        message: "Cannot have more than 10 tags",
+        message: "Tags must have between 1 and 20 items",
       },
     },
     thumbnail: {
@@ -81,9 +89,13 @@ const BlogPostSchema = new Schema<IBlogPost>(
       type: Boolean,
       default: false,
     },
-    views: {
-      type: Number,
-      default: 0,
+    viewsCount: { type: Number, default: 0 },
+    reactionsCount: {
+      1: { type: Number, default: 0 },
+      2: { type: Number, default: 0 },
+      3: { type: Number, default: 0 },
+      4: { type: Number, default: 0 },
+      5: { type: Number, default: 0 },
     },
     publishedAt: {
       type: Date,

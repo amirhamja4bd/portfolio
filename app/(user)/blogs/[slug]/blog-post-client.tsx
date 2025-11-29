@@ -12,16 +12,15 @@ import {
   Twitter,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
-import remarkGfm from "remark-gfm";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import BlogReactions from "@/components/blog-reactions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { BlogPost } from "@/lib/content";
+import MarkdownPreview from "@/lib/MarkdownPreview";
+import { timeAgo } from "@/lib/utils";
 
 interface BlogPostClientProps {
   post: BlogPost;
@@ -32,10 +31,29 @@ export default function BlogPostClient({
   post,
   relatedPosts,
 }: BlogPostClientProps) {
+  const htmlContentRef = useRef<HTMLDivElement | null>(null);
   const [readingProgress, setReadingProgress] = useState(0);
   const [isShareMenuOpen, setIsShareMenuOpen] = useState(false);
+  const [reactions, setReactions] = useState(
+    post.reactionsCount || {
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 0,
+    }
+  );
+  const [selectedReaction, setSelectedReaction] = useState<number | null>(null);
+  // Comments: separate approved comments from optimistic pending comments
+  const [approvedComments, setApprovedComments] = useState<any[]>([]);
+  const [pendingComments, setPendingComments] = useState<any[]>([]);
+  const [commentForm, setCommentForm] = useState({
+    name: "",
+    email: "",
+    content: "",
+  });
 
-  // Track reading progress
+  // Reading progress
   useEffect(() => {
     const updateReadingProgress = () => {
       const windowHeight = window.innerHeight;
@@ -49,6 +67,70 @@ export default function BlogPostClient({
     window.addEventListener("scroll", updateReadingProgress);
     return () => window.removeEventListener("scroll", updateReadingProgress);
   }, []);
+
+  // Track view (POST /api/blogs/[slug])
+  useEffect(() => {
+    const doView = async () => {
+      try {
+        await fetch(`/api/blogs/${post.slug}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ action: "view" }),
+        });
+      } catch (e) {
+        // ignore
+      }
+    };
+    doView();
+  }, [post.slug]);
+
+  // On client mount, fetch visitor-specific post data (visitorReaction, updated counts)
+  useEffect(() => {
+    const fetchVisitorState = async () => {
+      try {
+        const res = await fetch(`/api/blogs/${post.slug}`, {
+          cache: "no-store",
+          credentials: "include",
+        });
+        if (!res.ok) return;
+        const json = await res.json();
+        const data = json?.data || json;
+        if (data?.reactionsCount) setReactions(data.reactionsCount);
+        if (data?.visitorReaction !== undefined)
+          setSelectedReaction(data.visitorReaction);
+      } catch (e) {
+        // ignore
+      }
+    };
+    fetchVisitorState();
+  }, [post.slug]);
+
+  // Load comments from API on mount or when slug changes
+  useEffect(() => {
+    const controller = new AbortController();
+    const fetchComments = async () => {
+      try {
+        // Fetch comments for this slug
+        const res = await fetch(`/api/blogs/${post.slug}/comments`, {
+          cache: "no-store",
+          credentials: "include",
+          signal: controller.signal,
+        });
+        if (!res.ok) return;
+        const json = await res.json();
+        setApprovedComments(json?.data || []);
+      } catch (err) {
+        // Ignore network errors; keep existing comments in UI
+      }
+    };
+    fetchComments();
+    return () => controller.abort();
+  }, [post.slug]);
+
+  // Visible comments merges pending optimistic comments and approved
+  // server-side comments fetched from the API.
+  const visibleComments = [...pendingComments, ...approvedComments];
 
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
   const shareText = `Check out "${post.title}" by ${post.author.name}`;
@@ -65,6 +147,149 @@ export default function BlogPostClient({
   const copyToClipboard = () => {
     navigator.clipboard.writeText(shareUrl);
     toast.success("Link copied to clipboard!");
+  };
+
+  const postAction = async (payload: object) => {
+    const res = await fetch(`/api/blogs/${post.slug}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+    return res;
+  };
+
+  const handleReaction = async (reaction: number) => {
+    // optimistic update: update counts and selected state immediately
+    const prevReactions = { ...reactions };
+    const prevSelected = selectedReaction;
+    // compute optimistic new counts
+    const newCounts = { ...reactions } as any;
+    if (prevSelected === reaction) {
+      // toggle off
+      newCounts[reaction] = Math.max(0, (newCounts[reaction] || 1) - 1);
+      setSelectedReaction(null);
+    } else {
+      if (prevSelected) {
+        newCounts[prevSelected] = Math.max(
+          0,
+          (newCounts[prevSelected] || 1) - 1
+        );
+      }
+      newCounts[reaction] = (newCounts[reaction] || 0) + 1;
+      setSelectedReaction(reaction);
+    }
+    setReactions(newCounts);
+
+    try {
+      const res = await postAction({ action: "reaction", reaction });
+      if (res.ok) {
+        const body = await res.json();
+        // Update with canonical server counts and selected reaction
+        setReactions(body?.data?.reactionsCount || {});
+        const visitorReaction = body?.data?.visitorReaction ?? null;
+        setSelectedReaction(visitorReaction);
+      } else {
+        // rollback optimistic UI state
+        setReactions(prevReactions);
+        setSelectedReaction(prevSelected);
+        // If the server responded 409 (duplicate key / race), re-sync from server
+        if (res.status === 409) {
+          try {
+            const r = await fetch(`/api/blogs/${post.slug}`, {
+              cache: "no-store",
+              credentials: "include",
+            });
+            if (r.ok) {
+              const data = await r.json();
+              const d = data?.data || data;
+              setReactions(d?.reactionsCount || {});
+              setSelectedReaction(d?.visitorReaction ?? null);
+              return;
+            }
+          } catch (e) {
+            // ignore
+          }
+        }
+        const error = await res.json();
+        toast.error(error?.message || "Failed to update reaction");
+      }
+    } catch (e) {
+      // network error: rollback
+      setReactions(prevReactions);
+      setSelectedReaction(prevSelected);
+      toast.error("Network error");
+    }
+  };
+
+  const submitComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!commentForm.name || !commentForm.email || !commentForm.content) {
+      toast.error("Name, email and content are required");
+      return;
+    }
+
+    try {
+      const res = await postAction({
+        action: "comment",
+        name: commentForm.name,
+        email: commentForm.email,
+        content: commentForm.content,
+      });
+      if (res.ok) {
+        const body = await res.json();
+        const created = body?.data;
+
+        // Append the created comment optimistically so the user sees their
+        // feedback immediately. If the comment is pending moderation we
+        // show a status label; approved comments will just appear.
+        if (created) {
+          const resolved = {
+            _id: created._id || `temp-${Date.now()}`,
+            name: created.name || commentForm.name,
+            content: created.content || commentForm.content,
+            status: created.status || "pending",
+            createdAt: created.createdAt || new Date().toISOString(),
+          } as any;
+          if ((resolved.status || "pending") === "approved") {
+            setApprovedComments((prev) => [resolved, ...prev]);
+            // Remove from pending if it was previously added
+            setPendingComments((prev) =>
+              prev.filter((c) => c._id !== resolved._id)
+            );
+          } else {
+            // Add to pending comments optimistically
+            setPendingComments((prev) => [resolved, ...prev]);
+          }
+        }
+        toast.success("Comment submitted");
+        setCommentForm({ name: "", email: "", content: "" });
+        // Re-fetch approved comments in case moderation processed the
+        // comment synchronously and returned it as approved.
+        try {
+          const r = await fetch(`/api/blogs/${post.slug}/comments`, {
+            cache: "no-store",
+            credentials: "include",
+          });
+          if (r.ok) {
+            const j = await r.json();
+            const approved = j?.data || [];
+            // Remove any pending comments that have been approved (match by id)
+            setPendingComments((prev) =>
+              prev.filter((p) => !approved.some((a: any) => a._id === p._id))
+            );
+            setApprovedComments(approved);
+          }
+        } catch (e) {
+          // ignore
+        }
+      } else {
+        const err = await res.json();
+        toast.error(err?.message || "Failed to submit comment");
+      }
+    } catch (e) {
+      toast.error("Network error");
+    }
   };
 
   return (
@@ -161,6 +386,8 @@ export default function BlogPostClient({
                 alt={post.title}
                 className="h-full w-full object-cover"
               />
+
+              {/* No reaction overlay inside image; reactions will be shown after the image */}
             </motion.div>
           )}
 
@@ -169,24 +396,34 @@ export default function BlogPostClient({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="mb-6 flex flex-wrap items-center gap-4 text-sm text-muted-foreground"
+            className="mb-6 flex items-center justify-between gap-4 text-sm text-muted-foreground"
           >
-            <span className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              {post.publishedAt}
-            </span>
-            {post.readingTime && (
+            <div className="flex items-center gap-4">
               <span className="flex items-center gap-1">
-                <Clock className="h-4 w-4" />
-                {post.readingTime}
+                <Calendar className="h-4 w-4" />
+                {timeAgo(post.publishedAt)}
               </span>
-            )}
-            {post.views && (
-              <span className="flex items-center gap-1">
-                <Eye className="h-4 w-4" />
-                {post.views.toLocaleString()} views
-              </span>
-            )}
+              {post.readingTime && (
+                <span className="flex items-center gap-1">
+                  <Clock className="h-4 w-4" />
+                  {post.readingTime}
+                </span>
+              )}
+              {post.views && (
+                <span className="flex items-center gap-1">
+                  <Eye className="h-4 w-4" />
+                  {post.views.toLocaleString()} views
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center">
+              <BlogReactions
+                reactions={reactions}
+                onReact={handleReaction}
+                selectedReaction={selectedReaction}
+              />
+            </div>
           </motion.div>
 
           {/* Title */}
@@ -252,56 +489,83 @@ export default function BlogPostClient({
             transition={{ duration: 0.5, delay: 0.6 }}
             className="prose max-w-none dark:prose-invert prose-neutral"
           >
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                code({ inline, className, children, ...props }: any) {
-                  const match = /language-(\w+)/.exec(className || "");
-                  return !inline && match ? (
-                    <SyntaxHighlighter
-                      style={vscDarkPlus}
-                      language={match[1]}
-                      PreTag="div"
-                      {...props}
-                    >
-                      {String(children).replace(/\n$/, "")}
-                    </SyntaxHighlighter>
-                  ) : (
-                    <code className={className} {...props}>
-                      {children}
-                    </code>
-                  );
-                },
-                a({ children, ...props }: any) {
-                  return (
-                    <a
-                      {...props}
-                      className="text-primary hover:underline"
-                      target={
-                        props.href?.startsWith("http") ? "_blank" : undefined
-                      }
-                      rel={
-                        props.href?.startsWith("http")
-                          ? "noopener noreferrer"
-                          : undefined
-                      }
-                    >
-                      {children}
-                    </a>
-                  );
-                },
-                table({ children, ...props }: any) {
-                  return (
-                    <div className="overflow-x-auto">
-                      <table {...props}>{children}</table>
-                    </div>
-                  );
-                },
-              }}
-            >
-              {post.content}
-            </ReactMarkdown>
+            <MarkdownPreview
+              data={post.content}
+              htmlContentRef={htmlContentRef}
+            />
           </motion.div>
+
+          {/* Reactions (render after article when there is no cover image) */}
+          {!post.thumbnail && !post.coverImage && (
+            <div className="mt-8">
+              <BlogReactions
+                reactions={reactions}
+                onReact={handleReaction}
+                selectedReaction={selectedReaction}
+              />
+            </div>
+          )}
+
+          {/* Comments */}
+          <section className="mt-12">
+            <h3 className="mb-4 text-lg font-semibold">Comments</h3>
+            <form onSubmit={submitComment} className="mb-6 space-y-2">
+              <div className="flex gap-2">
+                <input
+                  className="flex-1 rounded px-3 py-2 border"
+                  placeholder="Name"
+                  value={commentForm.name}
+                  onChange={(e) =>
+                    setCommentForm((s) => ({ ...s, name: e.target.value }))
+                  }
+                />
+                <input
+                  className="flex-1 rounded px-3 py-2 border"
+                  placeholder="Email"
+                  value={commentForm.email}
+                  onChange={(e) =>
+                    setCommentForm((s) => ({ ...s, email: e.target.value }))
+                  }
+                />
+              </div>
+              <textarea
+                className="w-full rounded px-3 py-2 border"
+                placeholder="Write your comment..."
+                value={commentForm.content}
+                onChange={(e) =>
+                  setCommentForm((s) => ({ ...s, content: e.target.value }))
+                }
+              />
+              <div className="flex justify-end">
+                <Button type="submit">Submit Comment</Button>
+              </div>
+            </form>
+
+            {visibleComments.length === 0 ? (
+              <p className="text-muted-foreground">No comments yet.</p>
+            ) : (
+              <div className="space-y-4">
+                {visibleComments.map((c) => (
+                  <div key={c._id} className="rounded-lg border p-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="text-sm font-semibold">{c.name}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {timeAgo(c.createdAt)}
+                      </div>
+                      {c.status && c.status !== "approved" && (
+                        <div className="ml-2 rounded-full bg-yellow-100 px-2 py-0.5 text-xs text-yellow-700">
+                          {c.status}
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {c.content}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
         </div>
       </article>
 

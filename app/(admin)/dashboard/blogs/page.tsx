@@ -172,25 +172,25 @@ export default function BlogsPage() {
                 key={blog._id}
                 className="group rounded-xl border bg-card p-5 hover:shadow-lg transition-all"
               >
-                <div className="flex items-start gap-4">
+                <div className="flex flex-col sm:flex-row items-start gap-4">
                   {blog.thumbnail && (
                     <img
                       src={blog.thumbnail}
                       alt={blog.title}
-                      className="w-32 h-20 object-cover rounded-lg shrink-0"
+                      className="w-full h-44 sm:w-32 sm:h-20 object-cover rounded-lg shrink-0"
                     />
                   )}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-4 mb-2">
+                    <div className="flex items-start justify-between gap-4 mb-2 w-full">
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-lg mb-1 truncate">
+                        <h3 className="font-semibold text-lg mb-1 line-clamp-2 wrap-break-word">
                           {blog.title}
                         </h3>
-                        <p className="text-sm text-muted-foreground line-clamp-2">
+                        <p className="text-sm text-muted-foreground line-clamp-2 wrap-break-word">
                           {blog.category} • {blog.tags?.slice(0, 3).join(", ")}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center gap-2 shrink-0 mt-2 sm:mt-0 sm:ml-4">
                         <Button
                           size="sm"
                           variant="outline"
@@ -236,7 +236,7 @@ export default function BlogsPage() {
                         {blog.views || 0} views
                       </span>
                       {blog.tags && blog.tags.length > 0 && (
-                        <span>
+                        <span className="max-w-full block overflow-hidden text-ellipsis whitespace-nowrap sm:whitespace-normal wrap-break-word">
                           {blog.tags.slice(0, 3).join(", ")}
                           {blog.tags.length > 3 && ` +${blog.tags.length - 3}`}
                         </span>

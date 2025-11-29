@@ -95,7 +95,6 @@ export default function ProjectForm({
     `editor-new-${Date.now()}`
   );
   const isEditing = !!project;
-  console.log({ thumbnailUrl, imagesUrls });
 
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(projectFormSchema),

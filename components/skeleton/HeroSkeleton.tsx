@@ -1,6 +1,21 @@
 import { motion } from "framer-motion";
 type Props = {};
 
+/**
+ * Deterministic pseudo-random width generator based on index.
+ * Uses Math.sin to produce a repeatable pseudo-random value so server
+ * and client render the same width (avoids hydration mismatches).
+ */
+const getRowWidth = (index: number) => {
+  // Constants chosen to produce a pseudo-random but deterministic sequence.
+  const seed = index + 1;
+  const pseudoRandom = Math.abs(
+    (Math.sin(seed * 12.9898 + 78.233) * 43758.5453) % 1
+  );
+  // Map to a percentage between 40% and 100%.
+  return Number((40 + pseudoRandom * 60).toFixed(2));
+};
+
 const HeroSkeleton = ({}: Props) => {
   return (
     <section id="hero" className="relative py-8">
@@ -102,7 +117,7 @@ const HeroSkeleton = ({}: Props) => {
                     >
                       <div
                         className="bg-muted-foreground/20 rounded h-4 w-full animate-pulse"
-                        style={{ width: `${Math.random() * 60 + 40}%` }}
+                        style={{ width: `${getRowWidth(index)}%` }}
                       />
                     </motion.div>
                   ))}

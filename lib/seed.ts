@@ -194,24 +194,28 @@ async function seed() {
 
     // Create blog posts
     console.log("📝 Creating blog posts...");
+    const { default: docToHtml } = await import("./doc-to-html");
     const blogPosts = await BlogPost.insertMany([
       {
         title: "Getting Started with Next.js 14",
         slug: "getting-started-with-nextjs-14",
         excerpt:
           "Learn how to build modern web applications with Next.js 14 and the new App Router.",
-        content: {
+        content: docToHtml({
           time: Date.now(),
           blocks: [
             {
               type: "paragraph",
-              data: {
-                text: "Next.js 14 introduces significant improvements...",
-              },
+              content: [
+                {
+                  type: "text",
+                  text: "Next.js 14 introduces significant improvements...",
+                },
+              ],
             },
           ],
           version: "2.28.0",
-        },
+        } as any),
         tags: ["Next.js", "React", "Tutorial"],
         category: "Web Development",
         author: {
@@ -227,18 +231,21 @@ async function seed() {
         slug: "building-restful-apis-with-nodejs",
         excerpt:
           "A comprehensive guide to building scalable RESTful APIs using Node.js and Express.",
-        content: {
+        content: docToHtml({
           time: Date.now(),
           blocks: [
             {
               type: "paragraph",
-              data: {
-                text: "RESTful APIs are the backbone of modern web applications...",
-              },
+              content: [
+                {
+                  type: "text",
+                  text: "RESTful APIs are the backbone of modern web applications...",
+                },
+              ],
             },
           ],
           version: "2.28.0",
-        },
+        } as any),
         tags: ["Node.js", "API", "Backend"],
         category: "Backend Development",
         author: {
