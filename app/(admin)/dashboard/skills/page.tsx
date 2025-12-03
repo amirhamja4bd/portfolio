@@ -99,11 +99,16 @@ export default function SkillsPage() {
     fetchSkills();
   };
 
-  const filteredSkills = skills.filter(
-    (skill) =>
-      skill.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      skill.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredSkills = skills.filter((skill) => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      (skill.name || "").toLowerCase().includes(q) ||
+      (skill.category || "").toLowerCase().includes(q) ||
+      (skill.experienceLevel || "").toLowerCase().includes(q) ||
+      (skill.experienceYear || "").toString().toLowerCase().includes(q)
+    );
+  });
 
   const groupedSkills: Record<string, any[]> = filteredSkills.reduce(
     (acc, skill) => {
@@ -225,19 +230,30 @@ export default function SkillsPage() {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.2 }}
-                        className="group relative overflow-hidden rounded-lg border bg-card hover:bg-accent/50 hover:shadow-md transition-all duration-200"
+                        className="group relative overflow-hidden rounded-2xl bg-black/20 backdrop-blur-xl border border-white/10 p-2 shadow-2xl hover:border-white/20 transition-all duration-200"
                       >
-                        <div className="p-4">
-                          {/* Header with icon and proficiency */}
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/5 h-0.5 bg-linear-to-r from-transparent via-primary to-transparent opacity-60" />
+                        <div className="relative z-10 p-4">
+                          {/* Header with logo/icon and name */}
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-3">
-                              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 shrink-0">
-                                <DynamicIcon
-                                  name={skill.icon}
-                                  className="h-5 w-5 text-primary"
-                                />
-                              </div>
-                              <div className="min-w-0 flex-1">
+                              {skill.logo ? (
+                                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 p-2">
+                                  <img
+                                    className="w-full h-full object-contain"
+                                    src={skill.logo}
+                                    alt={`${skill.name} logo`}
+                                  />
+                                </div>
+                              ) : (
+                                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-linear-to-br from-primary/20 to-primary/5 backdrop-blur-sm border border-primary/20">
+                                  <DynamicIcon
+                                    name={skill.icon}
+                                    className="h-7 w-7 text-primary"
+                                  />
+                                </div>
+                              )}
+                              <div>
                                 <h4 className="font-medium text-sm text-foreground truncate group-hover:text-primary transition-colors">
                                   {skill.name}
                                 </h4>
@@ -246,29 +262,38 @@ export default function SkillsPage() {
                                 </p>
                               </div>
                             </div>
-                            <div className="text-right shrink-0">
+                            <div className="text-right shrink-0 flex flex-col items-end gap-1">
                               <span className="text-sm font-semibold text-primary">
                                 {skill.proficiency}%
                               </span>
+                              {skill.experienceLevel && (
+                                <span className="text-xs font-medium text-primary/80 capitalize px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20">
+                                  {skill.experienceLevel}
+                                </span>
+                              )}
+                              {skill.experienceYear && (
+                                <span className="text-[10px] text-muted-foreground/50">
+                                  {new Date().getFullYear() -
+                                    new Date(
+                                      skill.experienceYear
+                                    ).getFullYear()}
+                                  + years
+                                </span>
+                              )}
                             </div>
                           </div>
 
                           {/* Progress Bar */}
                           <div className="mb-3">
-                            <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                            <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                               <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${skill.proficiency}%` }}
                                 transition={{ duration: 0.8, delay: 0.1 }}
-                                className="h-full bg-linear-to-r from-primary to-primary/80 rounded-full"
+                                className="h-full bg-linear-to-r from-primary to-primary/60 rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)]"
                               />
                             </div>
                           </div>
-
-                          {/* Description */}
-                          <p className="text-xs text-muted-foreground mb-3 line-clamp-2 leading-relaxed">
-                            {skill.description}
-                          </p>
 
                           {/* Actions */}
                           <div className="flex items-center gap-2">
@@ -278,8 +303,7 @@ export default function SkillsPage() {
                               onClick={() => handleEdit(skill)}
                               className="w-1/2 h-8 text-xs hover:bg-primary hover:text-primary-foreground transition-colors"
                             >
-                              <Pencil className="h-3 w-3 mr-1" />
-                              Edit
+                              <Pencil className="h-3 w-3 mr-1" /> Edit
                             </Button>
                             <Button
                               size="sm"

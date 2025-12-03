@@ -45,12 +45,12 @@ async function createSkillHandler(
   if (
     !body.name ||
     !body.category ||
+    !body.experienceLevel ||
     body.proficiency === undefined ||
-    !body.description ||
     !body.icon
   ) {
     return apiError(
-      "Name, category, proficiency, description, and icon are required",
+      "Name, category, experience level, proficiency, and icon are required",
       400
     );
   }

@@ -260,7 +260,7 @@ export function AIChatAssistant() {
               "fixed bottom-6 right-6 z-50 bg-background/95 backdrop-blur-xl border border-border rounded-3xl shadow-2xl overflow-hidden",
               isCompact
                 ? "w-[90vw] sm:w-[340px] lg:w-[400px] h-[520px] max-h-[70vh]"
-                : "w-[95vw] sm:w-[400px] lg:w-[450px] h-[600px] max-h-[80vh]"
+                : "w-[95vw] sm:w-[400px] lg:w-[450px] h-[75vh] max-h-[80vh]"
             )}
           >
             {/* Header */}
@@ -302,16 +302,6 @@ export function AIChatAssistant() {
                         )}
                       />
                     </motion.div>
-                    <motion.div
-                      className="absolute -bottom-0.5 -right-0.5 h-3 w-3 bg-green-500 rounded-full border-2 border-background shadow-sm"
-                      animate={{
-                        scale: [1, 1.2, 1],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                      }}
-                    />
                   </div>
                   <div>
                     <h3

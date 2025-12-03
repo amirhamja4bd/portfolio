@@ -1,5 +1,6 @@
 "use client";
 
+import DynamicIcon from "@/components/dynamic-icon/DynamicIcon";
 import { motion } from "framer-motion";
 import { Github, Linkedin, Mail } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -19,34 +20,37 @@ export function HeroSection() {
   const [heroData, setHeroData] = useState<HeroData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [settings, setSettings] = useState<any>(null);
 
   useEffect(() => {
-    async function fetchHeroData() {
+    // fetch hero and settings in parallel
+    const fetchAll = async () => {
+      setIsLoading(true);
+      setError(null);
       try {
-        setIsLoading(true);
-        setError(null);
+        const [heroResp, settingsResp] = await Promise.all([
+          fetch("/api/hero"),
+          fetch("/api/settings"),
+        ]);
 
-        const response = await fetch("/api/hero");
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch hero data");
+        if (heroResp.ok) {
+          const heroJson = await heroResp.json();
+          if (heroJson.success && heroJson.data) setHeroData(heroJson.data);
         }
 
-        const result = await response.json();
-
-        if (result.success && result.data) {
-          setHeroData(result.data);
-        } else {
-          throw new Error(result.error || "Failed to load hero data");
+        if (settingsResp.ok) {
+          const settingsJson = await settingsResp.json();
+          if (settingsJson.success && settingsJson.data)
+            setSettings(settingsJson.data);
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
+        setError(err instanceof Error ? err.message : String(err));
       } finally {
         setIsLoading(false);
       }
-    }
+    };
 
-    fetchHeroData();
+    fetchAll();
   }, []);
 
   // Loading state
@@ -73,6 +77,11 @@ export function HeroSection() {
               transition={{ duration: 0.6, ease: "easeOut" }}
               className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-500/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-muted-foreground backdrop-blur w-fit"
             >
+              {/* Small glowing dot to the left of the badge text */}
+              <span
+                aria-hidden
+                className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.35)] animate-pulse"
+              />
               {heroData.badge.text}
             </motion.div>
             <motion.div
@@ -122,19 +131,30 @@ export function HeroSection() {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="flex gap-4 pt-4"
             >
-              {heroData.socialLinks.map((social) => {
-                const Icon =
-                  iconMap[social.icon as keyof typeof iconMap] || Mail;
+              {(settings?.socialAccounts && settings.socialAccounts.length
+                ? settings.socialAccounts
+                    .slice()
+                    .sort((a: any, b: any) => a.order - b.order)
+                : heroData.socialLinks
+              ).map((social: any) => {
+                const href = social.url || social.link;
+                const label = social.title || social.name || href;
+                // Use dynamic icon when provided; fall back to inline iconMap
+                const iconName = social.icon;
                 return (
                   <a
-                    key={social.title}
-                    href={social.link}
+                    key={label}
+                    href={href}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background transition-colors hover:border-foreground hover:bg-muted"
-                    aria-label={social.title}
+                    aria-label={label}
                   >
-                    <Icon className="h-5 w-5" />
+                    {iconName ? (
+                      <DynamicIcon name={iconName} className="h-5 w-5" />
+                    ) : (
+                      <Mail className="h-5 w-5" />
+                    )}
                   </a>
                 );
               })}

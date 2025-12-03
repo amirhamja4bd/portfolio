@@ -18,7 +18,8 @@ async function getProjectsHandler(request: NextRequest) {
   await connectDB();
 
   const { page, limit, skip } = getPaginationParams(request);
-  const { search, category, featured, published } = getSearchParams(request);
+  const { search, category, featured, published, sort } =
+    getSearchParams(request);
 
   // Build query
   const query: any = {};
@@ -53,9 +54,23 @@ async function getProjectsHandler(request: NextRequest) {
   // Get total count
   const total = await Project.countDocuments(query);
 
+  // Determine sort
+  const sortMap: Record<string, any> = {
+    newest: { createdAt: -1 },
+    oldest: { createdAt: 1 },
+    order: { order: 1 },
+    "title-asc": { title: 1 },
+    "title-desc": { title: -1 },
+  };
+
+  const sortObj =
+    sort && sortMap[sort as string]
+      ? sortMap[sort as string]
+      : { order: 1, createdAt: -1 };
+
   // Get projects with pagination
   const projects = await Project.find(query)
-    .sort({ order: 1, createdAt: -1 })
+    .sort(sortObj)
     .skip(skip)
     .limit(limit);
 

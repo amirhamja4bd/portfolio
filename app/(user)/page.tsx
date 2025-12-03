@@ -1,4 +1,4 @@
-import SplashScreen from "@/components/CodeLoader copy";
+import SplashScreen from "@/components/CodeLoader";
 import { AboutSection } from "@/components/sections/about";
 import { BlogSection } from "@/components/sections/blog";
 import { ContactSection } from "@/components/sections/contact";

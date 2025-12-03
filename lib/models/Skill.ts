@@ -9,9 +9,11 @@ export interface ISkill extends Document {
     | "database"
     | "tooling"
     | "leadership";
+  experienceLevel: "beginner" | "intermediate" | "advanced" | "expert";
   proficiency: number;
-  description: string;
   icon: string;
+  logo?: string;
+  experienceYear?: Date;
   order: number;
   isActive: boolean;
   createdAt: Date;
@@ -38,22 +40,29 @@ const SkillSchema = new Schema<ISkill>(
         "leadership",
       ],
     },
+    experienceLevel: {
+      type: String,
+      required: [true, "Experience level is required"],
+      enum: ["beginner", "intermediate", "advanced", "expert"],
+      default: "intermediate",
+    },
     proficiency: {
       type: Number,
       required: [true, "Proficiency level is required"],
       min: [0, "Proficiency cannot be less than 0"],
       max: [100, "Proficiency cannot exceed 100"],
     },
-    description: {
-      type: String,
-      required: [true, "Description is required"],
-      trim: true,
-      maxlength: [300, "Description cannot exceed 300 characters"],
-    },
     icon: {
       type: String,
       required: [true, "Icon name is required"],
       trim: true,
+    },
+    logo: {
+      type: String,
+      trim: true,
+    },
+    experienceYear: {
+      type: Date,
     },
     order: {
       type: Number,
@@ -73,7 +82,11 @@ const SkillSchema = new Schema<ISkill>(
 SkillSchema.index({ category: 1, order: 1 });
 SkillSchema.index({ isActive: 1 });
 
-const Skill: Model<ISkill> =
-  mongoose.models.Skill || mongoose.model<ISkill>("Skill", SkillSchema);
+// Clear the model cache to avoid schema conflicts
+if (mongoose.models.Skill) {
+  delete mongoose.models.Skill;
+}
+
+const Skill: Model<ISkill> = mongoose.model<ISkill>("Skill", SkillSchema);
 
 export default Skill;

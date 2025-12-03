@@ -192,6 +192,7 @@ export const projectApi = {
     category?: string;
     featured?: boolean;
     all?: boolean;
+    sort?: string;
   }) => api.get("/api/projects", params),
 
   getBySlug: (slug: string) => api.get(`/api/projects/${slug}`),

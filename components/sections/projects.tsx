@@ -2,7 +2,13 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { ArrowUpRight, ExternalLink, Github, Play } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  ExternalLink,
+  Github,
+  Play,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo } from "react";
@@ -61,11 +67,19 @@ export function ProjectsSection() {
   }, [data]);
   return (
     <section id="projects" className="scroll-mt-24">
-      <div className="max-w-2xl space-y-4">
-        <h2 className="text-3xl font-semibold lg:text-4xl">
-          {projectsData.title}
-        </h2>
-        <p className="text-muted-foreground">{projectsData.description}</p>
+      <div className="flex items-start justify-between gap-8">
+        <div className="max-w-2xl space-y-4">
+          <h2 className="text-3xl font-semibold lg:text-4xl">
+            {projectsData.title}
+          </h2>
+          <p className="text-muted-foreground">{projectsData.description}</p>
+        </div>
+        <Button asChild className="shrink-0" variant="outline">
+          <Link href="/projects" className="flex items-center gap-2">
+            View all projects <ArrowRight className="h-4 w-4" />
+            <ArrowUpRight className="ml-2 h-4 w-4" />
+          </Link>
+        </Button>
       </div>
 
       <div className="mt-12 grid gap-6 lg:grid-cols-2 xl:grid-cols-3">

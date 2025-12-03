@@ -25,11 +25,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { skillApi } from "@/lib/api-client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ImagePlus, Loader2, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -44,15 +43,14 @@ const skillFormSchema = z.object({
     "tooling",
     "leadership",
   ]),
+  experienceLevel: z.enum(["beginner", "intermediate", "advanced", "expert"]),
   proficiency: z.coerce
     .number()
     .min(0, "Proficiency must be at least 0")
     .max(100, "Proficiency cannot exceed 100"),
-  description: z
-    .string()
-    .min(1, "Description is required")
-    .max(300, "Description cannot exceed 300 characters"),
   icon: z.string().min(1, "Icon is required"),
+  logo: z.string().optional(),
+  experienceYear: z.string().optional(),
   isActive: z.boolean().optional(),
 });
 
@@ -72,6 +70,9 @@ export function SkillFormModal({
   onSuccess,
 }: SkillFormModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [logoPreview, setLogoPreview] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const isEditing = !!skill;
 
   const form = useForm<SkillFormValues>({
@@ -79,34 +80,130 @@ export function SkillFormModal({
     defaultValues: {
       name: "",
       category: "frontend",
+      experienceLevel: "intermediate",
       proficiency: 50,
-      description: "",
       icon: "",
+      logo: "",
+      experienceYear: "",
       isActive: true,
     },
   });
 
   useEffect(() => {
     if (skill) {
+      const experienceYearValue = skill.experienceYear
+        ? new Date(skill.experienceYear).toISOString().split("T")[0]
+        : "";
+
       form.reset({
         name: skill.name || "",
         category: skill.category || "frontend",
+        experienceLevel: skill.experienceLevel || "intermediate",
         proficiency: skill.proficiency || 50,
-        description: skill.description || "",
         icon: skill.icon || "",
+        logo: skill.logo || "",
+        experienceYear: experienceYearValue,
         isActive: skill.isActive !== false,
       });
+      setLogoPreview(skill.logo || "");
     } else {
       form.reset({
         name: "",
         category: "frontend",
+        experienceLevel: "intermediate",
         proficiency: 50,
-        description: "",
         icon: "",
+        logo: "",
+        experienceYear: "",
         isActive: true,
       });
+      setLogoPreview("");
     }
   }, [skill, form]);
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file");
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File size should not exceed 5MB");
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+
+      // Create FormData
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("type", "skills");
+
+      // Upload to server
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const data = await response.json();
+
+      if (data.success && data.data?.url) {
+        // Update form value
+        form.setValue("logo", data.data.url);
+        setLogoPreview(data.data.url);
+        toast.success("Logo uploaded successfully");
+      } else {
+        throw new Error(data.message || "Upload failed");
+      }
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      toast.error(error.message || "Failed to upload logo");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleRemoveLogo = async () => {
+    const currentLogo = form.getValues("logo");
+
+    if (currentLogo) {
+      try {
+        // Delete from server
+        const response = await fetch("/api/upload", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ url: currentLogo }),
+        });
+
+        if (!response.ok) {
+          console.error("Failed to delete file from server");
+        }
+      } catch (error) {
+        console.error("Error deleting file:", error);
+      }
+    }
+
+    form.setValue("logo", "");
+    setLogoPreview("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    toast.success("Logo removed successfully");
+  };
 
   const onSubmit = async (data: SkillFormValues) => {
     try {
@@ -207,6 +304,37 @@ export function SkillFormModal({
 
               <FormField
                 control={form.control}
+                name="experienceLevel"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Experience Level *</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select experience level" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="beginner">Beginner</SelectItem>
+                        <SelectItem value="intermediate">
+                          Intermediate
+                        </SelectItem>
+                        <SelectItem value="advanced">Advanced</SelectItem>
+                        <SelectItem value="expert">Expert</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
                 name="proficiency"
                 render={({ field }) => (
                   <FormItem>
@@ -224,22 +352,98 @@ export function SkillFormModal({
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="experienceYear"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Experience Since (Optional)</FormLabel>
+                    <FormControl>
+                      <Input type="date" placeholder="Select date" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      When you started using this skill
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             <FormField
               control={form.control}
-              name="description"
+              name="logo"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description *</FormLabel>
+                  <FormLabel>Skill Logo (Optional)</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Brief description of your experience with this skill"
-                      rows={3}
-                      {...field}
-                    />
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center gap-4">
+                        {/* Square Upload Area */}
+                        <div
+                          onClick={() => fileInputRef.current?.click()}
+                          className="relative w-24 h-24 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors flex items-center justify-center bg-muted/50 hover:bg-muted group"
+                        >
+                          {logoPreview ? (
+                            <>
+                              <img
+                                src={logoPreview}
+                                alt="Logo preview"
+                                className="w-full h-full object-contain p-2 rounded-lg"
+                              />
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRemoveLogo();
+                                }}
+                                className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center text-muted-foreground">
+                              {isUploading ? (
+                                <Loader2 className="w-6 h-6 animate-spin" />
+                              ) : (
+                                <>
+                                  <ImagePlus className="w-6 h-6 mb-1" />
+                                  <span className="text-xs">Upload</span>
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Upload Info */}
+                        <div className="flex-1">
+                          <p className="text-sm text-muted-foreground mb-1">
+                            Click the square to upload a logo image
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            PNG, JPG, WebP or GIF (max. 5MB)
+                          </p>
+                          {logoPreview && (
+                            <p className="text-xs text-primary mt-1">
+                              ✓ Logo uploaded
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Hidden File Input */}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="hidden"
+                        disabled={isUploading}
+                      />
+                    </div>
                   </FormControl>
-                  <FormDescription>Max 300 characters</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

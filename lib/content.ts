@@ -12,9 +12,11 @@ export interface SkillItem {
   id: string;
   name: string;
   category: SkillCategory;
+  experienceLevel?: "beginner" | "intermediate" | "advanced" | "expert";
   proficiency: number;
-  description: string;
   icon: string;
+  logo?: string;
+  experienceYear?: Date | string;
 }
 
 export const skills: SkillItem[] = [
@@ -22,57 +24,56 @@ export const skills: SkillItem[] = [
     id: "react",
     name: "React",
     category: "frontend",
+    experienceLevel: "expert",
     proficiency: 95,
-    description: "Hooks, Suspense, Server Components, performance profiling",
     icon: "Atom",
   },
   {
     id: "nextjs",
     name: "Next.js",
     category: "frontend",
+    experienceLevel: "expert",
     proficiency: 92,
-    description:
-      "App Router, Edge runtime, incremental adoption, Vercel platform",
     icon: "Rocket",
   },
   {
     id: "typescript",
     name: "TypeScript",
     category: "tooling",
+    experienceLevel: "expert",
     proficiency: 96,
-    description: "Type-safe design systems, API contracts, monorepos",
     icon: "Type",
   },
   {
     id: "node",
     name: "Node.js",
     category: "backend",
+    experienceLevel: "advanced",
     proficiency: 90,
-    description: "REST/GraphQL APIs, messaging, background jobs",
     icon: "Cpu",
   },
   {
     id: "mongodb",
     name: "MongoDB",
     category: "database",
+    experienceLevel: "advanced",
     proficiency: 85,
-    description: "Schema design, indexing, aggregation pipelines",
     icon: "Database",
   },
   {
     id: "aws",
     name: "AWS",
     category: "devops",
+    experienceLevel: "advanced",
     proficiency: 82,
-    description: "Serverless, container orchestration, observability pipelines",
     icon: "Cloud",
   },
   {
     id: "leadership",
     name: "Engineering Leadership",
     category: "leadership",
+    experienceLevel: "advanced",
     proficiency: 88,
-    description: "Team building, roadmap shaping, incident response",
     icon: "Sparkles",
   },
 ];

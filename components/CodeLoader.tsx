@@ -11,7 +11,7 @@ export default function SplashScreen() {
     // Hide splash screen after animation completes
     const timer = setTimeout(() => {
       setIsVisible(false);
-    }, 4000);
+    }, 3000);
 
     return () => {
       clearTimeout(timer);
@@ -160,7 +160,7 @@ export default function SplashScreen() {
                 </div>
 
                 {/* Code Lines */}
-                <div className="space-y-1 opacity-60">
+                <div className="space-y-1">
                   {codeLines.map((line, index) => (
                     <motion.div
                       key={index}
@@ -172,7 +172,7 @@ export default function SplashScreen() {
                       <span className="text-slate-500 text-xs w-6 text-right">
                         {index + 1}
                       </span>
-                      <span
+                      <pre
                         className={
                           line.includes("function")
                             ? "text-violet-400"
@@ -187,7 +187,7 @@ export default function SplashScreen() {
                         }
                       >
                         {line}
-                      </span>
+                      </pre>
                     </motion.div>
                   ))}
                 </div>
