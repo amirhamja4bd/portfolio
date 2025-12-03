@@ -8,6 +8,7 @@ import Hero from "./Hero";
 import PostReaction from "./PostReaction";
 import PostView from "./PostView";
 import Project from "./Project";
+import Settings from "./Settings";
 import Skill from "./Skill";
 
 export {
@@ -21,6 +22,7 @@ export {
   PostReaction,
   PostView,
   Project,
+  Settings,
   Skill,
 };
 
@@ -32,6 +34,7 @@ export default {
   Experience,
   Hero,
   Project,
+  Settings,
   Skill,
   PostView,
   PostReaction,

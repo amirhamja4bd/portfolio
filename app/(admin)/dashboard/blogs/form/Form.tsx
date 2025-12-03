@@ -335,7 +335,6 @@ export default function BlogFormPage() {
               Views: <span className="font-semibold">{stats.views || 0}</span>
             </div>
             <div className="rounded-md border px-3 py-2">
-              Reactions:
               <div className="ml-2 flex items-center gap-2">
                 <span className="text-xs flex items-center gap-2">
                   <ThumbsUp width={14} height={14} color="#1877f2" />{" "}

@@ -1,44 +1,86 @@
 "use client";
-
-import { MoonStar, Sun } from "lucide-react";
+import useSettings from "@/hooks/useSettings";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { ThemeToggleButton, useThemeTransition } from "./ThemeToggleButton";
 
-import { Button } from "@/components/ui/button";
+// Define the props type
+interface ThemeToggleProps {
+  type: "circle" | "circle-blur" | "polygon" | "gif";
+}
 
-export function ThemeToggle() {
-  const { theme, setTheme, systemTheme } = useTheme();
+const ThemeToggle: React.FC<ThemeToggleProps> = ({ type }) => {
+  const { setTheme } = useTheme();
+  const { settings, updateSettings } = useSettings();
+  const { startTransition } = useThemeTransition();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setMounted(true), 0);
-    return () => window.clearTimeout(timer);
+    setMounted(true);
   }, []);
 
-  const currentTheme = theme === "system" ? systemTheme : theme;
+  const handleThemeToggle = useCallback(() => {
+    const newMode: any = settings.mode === "dark" ? "light" : "dark";
 
-  const toggleTheme = () => {
-    if (currentTheme === "dark") {
-      setTheme("light");
-    } else {
-      setTheme("dark");
-    }
-  };
+    startTransition(() => {
+      const updatedSettings = {
+        ...settings,
+        mode: newMode,
+        theme: {
+          ...settings.theme,
+          styles: {
+            light: settings.theme.styles?.light || {},
+            dark: settings.theme.styles?.dark || {},
+          },
+        },
+      };
+      updateSettings(updatedSettings);
+      setTheme(newMode);
+    });
+  }, [settings, updateSettings, setTheme, startTransition]);
+
+  const currentTheme =
+    settings.mode === "system" ? "light" : (settings.mode as "light" | "dark");
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="icon"
-      onClick={toggleTheme}
-      aria-label="Toggle theme"
-      className="relative"
-    >
-      {mounted && currentTheme === "dark" ? (
-        <MoonStar className="h-5 w-5" />
-      ) : (
-        <Sun className="h-5 w-5" />
+    <div className="">
+      {type === "circle" && (
+        <ThemeToggleButton
+          theme={currentTheme}
+          onClick={handleThemeToggle}
+          variant="circle"
+          start="center"
+        />
       )}
-    </Button>
+      {type === "circle-blur" && (
+        <ThemeToggleButton
+          theme={currentTheme}
+          onClick={handleThemeToggle}
+          variant="circle-blur"
+          start="top-right"
+        />
+      )}
+      {type === "polygon" && (
+        <ThemeToggleButton
+          theme={currentTheme}
+          onClick={handleThemeToggle}
+          variant="polygon"
+        />
+      )}
+      {type === "gif" && (
+        <ThemeToggleButton
+          theme={currentTheme}
+          onClick={handleThemeToggle}
+          variant="gif"
+          url="https://media.giphy.com/media/KBbr4hHl9DSahKvInO/giphy.gif?cid=790b76112m5eeeydoe7et0cr3j3ekb1erunxozyshuhxx2vl&ep=v1_stickers_search&rid=giphy.gif&ct=s"
+        />
+      )}
+    </div>
   );
-}
+};
+
+export default ThemeToggle;

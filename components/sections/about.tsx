@@ -203,10 +203,15 @@ export function AboutSection() {
           <h2 className="text-3xl font-semibold lg:text-4xl">
             {aboutData.title}
           </h2>
-          <p className="text-lg text-muted-foreground">
-            {aboutData.description}
+          <p className="text-lg text-muted-foreground text-start">
+            {aboutData.description.split("\n").map((line, idx) => (
+              <span key={idx}>
+                {line}
+                <br />
+              </span>
+            ))}
           </p>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="gridh gap-4 sm:grid-cols-2 hidden">
             {aboutData.infoCards.map((card) => (
               <InfoCard
                 key={card.title}

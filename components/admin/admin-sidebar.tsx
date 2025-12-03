@@ -80,6 +80,11 @@ const navigationItems = [
     href: "/dashboard/contact",
     icon: Mail,
   },
+  {
+    name: "Settings",
+    href: "/dashboard/settings",
+    icon: Settings,
+  },
 ];
 
 export function AdminSidebar() {

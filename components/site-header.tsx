@@ -5,14 +5,36 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
+import ThemeToggle from "./theme-toggle";
 
 export function SiteHeader() {
   const pathname = usePathname();
   const [activeSection, setActiveSection] = useState<string>("");
+  const [resumeUrl, setResumeUrl] = useState<string>("");
+
+  // Fetch primary resume URL
+  useEffect(() => {
+    const fetchResumeUrl = async () => {
+      try {
+        const response = await fetch("/api/settings");
+        if (response.ok) {
+          const result = await response.json();
+          const primaryResume = result.data?.resumes?.find(
+            (r: any) => r.isPrimary
+          );
+          if (primaryResume) {
+            setResumeUrl(primaryResume.resumeUrl);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch resume:", error);
+      }
+    };
+    fetchResumeUrl();
+  }, []);
 
   useEffect(() => {
     // Only run on homepage
@@ -96,10 +118,18 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <ThemeToggle />
-          <Button asChild variant="outline">
-            <a href={siteConfig.mail}>Contact</a>
-          </Button>
+          <ThemeToggle type="circle-blur" />
+          {resumeUrl ? (
+            <Button asChild variant="outline">
+              <a href={resumeUrl} target="_blank" rel="noopener noreferrer">
+                Resume
+              </a>
+            </Button>
+          ) : (
+            <Button variant="outline" disabled>
+              Resume
+            </Button>
+          )}
         </div>
       </div>
     </motion.header>

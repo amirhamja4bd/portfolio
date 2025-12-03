@@ -18,6 +18,9 @@ const PLUGIN_KEY = new PluginKey("image-delete-plugin");
 export const ImageDeletePlugin = Extension.create({
   name: "image-delete-plugin",
   addProseMirrorPlugins() {
+    const pendingDeletes = new Map<string, any>();
+    let editorView: any = null;
+
     const plugin = new Plugin({
       key: PLUGIN_KEY,
       state: {
@@ -31,28 +34,55 @@ export const ImageDeletePlugin = Extension.create({
 
             // Update state
             const next = current;
-
-            // Fire async delete requests for removed images only on the client
             if (typeof window !== "undefined" && removed.length) {
-              removed.forEach(async (src) => {
+              const added = Array.from(current).filter((s) => !value.has(s));
+
+              removed.forEach((src) => {
                 if (!src || typeof src !== "string") return;
-                // Only delete images that were uploaded to our /uploads/* path
                 if (!src.includes("/uploads/")) return;
-                try {
-                  await fetch("/api/upload", {
-                    method: "DELETE",
-                    credentials: "include",
-                    headers: {
-                      "content-type": "application/json",
-                    },
-                    body: JSON.stringify({ url: src }),
-                  });
-                } catch (err: any) {
-                  console.error("Failed to delete image:", err);
-                  toast.error("Failed to delete image on the server.");
-                }
+
+                if (added.length) return;
+
+                if (pendingDeletes.has(src)) return;
+
+                const timer = setTimeout(async () => {
+                  try {
+                    const srcsNow = editorView
+                      ? getImageSrcs(editorView.state.doc)
+                      : [];
+                    if (srcsNow.includes(src)) {
+                      pendingDeletes.delete(src);
+                      return;
+                    }
+
+                    await fetch("/api/upload", {
+                      method: "DELETE",
+                      credentials: "include",
+                      headers: {
+                        "content-type": "application/json",
+                      },
+                      body: JSON.stringify({ url: src }),
+                    });
+                  } catch (err: any) {
+                    console.error("Failed to delete image:", err);
+                    toast.error("Failed to delete image on the server.");
+                  } finally {
+                    pendingDeletes.delete(src);
+                  }
+                }, 2000);
+
+                pendingDeletes.set(src, timer);
               });
             }
+
+            // Clear any pending deletions if images were re-added
+            Array.from(pendingDeletes.keys()).forEach((pendingSrc) => {
+              if (current.has(pendingSrc)) {
+                const t = pendingDeletes.get(pendingSrc);
+                if (t) clearTimeout(t);
+                pendingDeletes.delete(pendingSrc);
+              }
+            });
 
             return next;
           } catch (err) {
@@ -60,6 +90,17 @@ export const ImageDeletePlugin = Extension.create({
             return value;
           }
         },
+      },
+      view: (view) => {
+        editorView = view;
+        return {
+          update: () => {},
+          destroy: () => {
+            // Clean up scheduled timers
+            pendingDeletes.forEach((t) => clearTimeout(t));
+            pendingDeletes.clear();
+          },
+        };
       },
     });
 
