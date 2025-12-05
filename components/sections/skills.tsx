@@ -226,15 +226,15 @@ export function SkillsSection() {
                     className="group relative overflow-hidden rounded-2xl border border-white/10 bg-transparent backdrop-blur-[2px] shadow-2xl hover:shadow-emerald-500/0 transition-all duration-500 w-[180px]"
                   >
                     {/* Partial top border */}
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-2/3 bg-linear-to-r from-transparent via-emerald-400/80 to-transparent" />
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-2/3 bg-linear-to-r from-transparent via-brand/80 to-transparent" />
 
                     {/* Gradient overlay on hover */}
-                    <div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute inset-0 bg-linear-to-br from-brand/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                     {/* Content */}
                     <div className="relative z-10 flex flex-col items-center text-center p-6">
                       {/* Logo or Icon */}
-                      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-transparent shadow-lg ring-1 ring-white/10 group-hover:ring-emerald-500/50 group-hover:shadow-emerald-500/20 transition-all duration-500">
+                      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-transparent shadow-lg ring-1 ring-white/10 group-hover:ring-brand/50 group-hover:shadow-brand/20 transition-all duration-500">
                         {skill.logo ? (
                           <img
                             src={skill.logo}
@@ -244,7 +244,7 @@ export function SkillsSection() {
                         ) : (
                           <DynamicIcon
                             name={skill.icon}
-                            className="h-8 w-8 text-emerald-400 group-hover:scale-110 transition-transform duration-500"
+                            className="h-8 w-8 text-brand group-hover:scale-110 transition-transform duration-500"
                           />
                         )}
                       </div>
@@ -271,7 +271,7 @@ export function SkillsSection() {
                     </div>
 
                     {/* Decorative glow effect */}
-                    <div className="absolute -bottom-24 -right-24 h-48 w-48 rounded-full bg-transparent blur-3xl group-hover:bg-emerald-500/20 transition-all duration-700" />
+                    <div className="absolute -bottom-24 -right-24 h-48 w-48 rounded-full bg-transparent blur-3xl group-hover:bg-brand/20 transition-all duration-500" />
                   </motion.div>
                 );
               })}

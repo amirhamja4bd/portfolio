@@ -193,7 +193,7 @@ function CodeTerminal() {
           <span className="text-white">engineer</span>&nbsp;
           <span className="text-cyan-400">=</span>&nbsp;
           <span className="text-yellow-400">new</span>&nbsp;
-          <span className="text-brand-accent">SoftwareEngineer</span>
+          <span className="text-brand">SoftwareEngineer</span>
           <span className="text-white">();</span>
         </>
       ),
@@ -230,7 +230,7 @@ function CodeTerminal() {
       content: (
         <>
           <span className="text-pink-400">name: </span>
-          <span className="text-brand-accent">"Amir Hamza"</span>
+          <span className="text-brand">"Amir Hamza"</span>
           <span className="text-white">,</span>
         </>
       ),
@@ -240,7 +240,7 @@ function CodeTerminal() {
       content: (
         <>
           <span className="text-pink-400">title: </span>
-          <span className="text-brand-accent">"Software Engineer (L1)"</span>
+          <span className="text-brand">"Software Engineer (L1)"</span>
           <span className="text-white">,</span>
         </>
       ),
@@ -258,17 +258,17 @@ function CodeTerminal() {
       indent: 4,
       content: (
         <div className="">
-          <span className="text-brand-accent">"React"</span>
+          <span className="text-brand">"React"</span>
           <span className="text-white">, </span>
-          <span className="text-brand-accent">"Next.js"</span>
+          <span className="text-brand">"Next.js"</span>
           <span className="text-white">, </span>
-          <span className="text-brand-accent">"TypeScript"</span>
+          <span className="text-brand">"TypeScript"</span>
           <span className="text-white">,</span>
-          <span className="text-brand-accent">"Node.js"</span>
+          <span className="text-brand">"Node.js"</span>
           <span className="text-white">, </span>
-          <span className="text-brand-accent">"Express.js"</span>
+          <span className="text-brand">"Express.js"</span>
           <span className="text-white">, </span>
-          <span className="text-brand-accent">"MongoDB"</span>
+          <span className="text-brand">"MongoDB"</span>
         </div>
       ),
     },
@@ -297,7 +297,7 @@ function CodeTerminal() {
       indent: 4,
       content: (
         <>
-          <span className="text-brand-accent">
+          <span className="text-brand">
             "Engineering robust, scalable platforms with exceptional user
             experience."
             <span className="text-white">,</span>
@@ -310,7 +310,7 @@ function CodeTerminal() {
       content: (
         <div className="flex ">
           <span className="text-pink-400">focus: </span>
-          <span className="text-brand-accent">
+          <span className="text-brand">
             "Platform Engineering & Modern Frontend Architecture"
             <span className="text-white">,</span>
           </span>
@@ -322,7 +322,7 @@ function CodeTerminal() {
       content: (
         <div className="flex ">
           <span className="text-pink-400">currentlyBuilding: </span>
-          <span className="text-brand-accent">
+          <span className="text-brand">
             "Next-generation full-stack web applications"
             <span className="text-white">,</span>
           </span>
@@ -391,13 +391,13 @@ function CodeTerminal() {
               {line.content}
               {/* Show cursor on current line during streaming */}
               {currentLine === index && !isStreamingComplete && showCursor && (
-                <span className="ml-0.5 inline-block h-4 w-2 bg-brand-accent animate-pulse" />
+                <span className="ml-0.5 inline-block h-4 w-2 bg-brand animate-pulse" />
               )}
               {/* Show permanent blinking cursor at end of last line after streaming */}
               {index === codeLines.length - 1 &&
                 isStreamingComplete &&
                 showCursor && (
-                  <span className="ml-0.5 inline-block h-4 w-2 bg-brand-accent" />
+                  <span className="ml-0.5 inline-block h-4 w-2 bg-brand" />
                 )}
             </motion.div>
           ))}

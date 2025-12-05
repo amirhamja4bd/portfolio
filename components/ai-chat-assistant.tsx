@@ -282,7 +282,7 @@ export function AIChatAssistant() {
                     <motion.div
                       className={cn(
                         isCompact ? "h-10 w-10" : "h-12 w-12",
-                        "rounded-full bg-brand-accent flex items-center justify-center shadow-lg"
+                        "rounded-full bg-brand flex items-center justify-center shadow-lg"
                       )}
                       animate={{
                         boxShadow: [

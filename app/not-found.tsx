@@ -7,7 +7,7 @@ export default function NotFound() {
       <div className="bg-white/5 backdrop-blur-sm rounded-2xl shadow-xl ring-1 ring-white/5 p-10 max-w-2xl w-full text-center">
         <div className="mb-4">
           <span
-            className="block text-7xl sm:text-8xl font-extrabold text-brand-accent"
+            className="block text-7xl sm:text-8xl font-extrabold text-brand"
             aria-hidden="true"
           >
             404

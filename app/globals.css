@@ -32,6 +32,7 @@
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-brand: var(--brandColor);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -44,8 +45,7 @@
 
 :root {
   --radius: 0.625rem;
-  /* Brand accent as RGB triplet (no alpha). Use in CSS with rgb(var(--brand-accent)) or rgba(var(--brand-accent), 0.12) */
-  --brand-accent: 52 211 153;
+  --brandColor: oklch(85.8% 0.194 163.8);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -121,42 +121,43 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-family, var(--font-geist-sans));
   }
 }
 
 /* Brand utility helpers (single RGB variable + opacity variants)
    Usage examples:
-     class="bg-brand-accent" -> solid brand color
-     class="bg-brand-accent/12" -> 12% alpha
-     class="bg-brand-accent/25" -> 25% alpha
-   These classes are small helpers so you can reuse the single --brand-accent variable
+     class="bg-brandColor" -> solid brand color
+     class="bg-brandColor/12" -> 12% alpha
+     class="bg-brandColor/25" -> 25% alpha
+   These classes are small helpers so you can reuse the single --brandColor variable
 */
 @layer utilities {
-  .bg-brand-accent {
-    background-color: rgb(var(--brand-accent)) !important;
+  .bg-brandColor {
+    background-color: oklch(var(--brandColor)) !important;
   }
-  .bg-brand-accent\/12 {
-    background-color: rgba(var(--brand-accent), 0.12) !important;
+  .bg-brandColor\/12 {
+    background-color: oklch(var(--brandColor) / 0.12) !important;
   }
-  .bg-brand-accent\/18 {
-    background-color: rgba(var(--brand-accent), 0.18) !important;
+  .bg-brandColor\/18 {
+    background-color: oklch(var(--brandColor) / 0.18) !important;
   }
-  .bg-brand-accent\/20 {
-    background-color: rgba(var(--brand-accent), 0.2) !important;
+  .bg-brandColor\/20 {
+    background-color: oklch(var(--brandColor) / 0.2) !important;
   }
-  .bg-brand-accent\/25 {
-    background-color: rgba(var(--brand-accent), 0.25) !important;
+  .bg-brandColor\/25 {
+    background-color: oklch(var(--brandColor) / 0.25) !important;
   }
-  .bg-brand-accent\/35 {
-    background-color: rgba(var(--brand-accent), 0.35) !important;
+  .bg-brandColor\/35 {
+    background-color: oklch(var(--brandColor) / 0.35) !important;
   }
 
   /* Foreground (text) helpers */
-  .text-brand-accent {
-    color: rgb(var(--brand-accent)) !important;
+  .text-brandColor {
+    color: oklch(var(--brandColor)) !important;
   }
-  .ring-brand-accent {
-    box-shadow: 0 0 0 3px rgba(var(--brand-accent), 0.12) !important;
+  .ring-brandColor {
+    box-shadow: 0 0 0 3px oklch(var(--brandColor) / 0.12) !important;
   }
 }
 

@@ -75,12 +75,12 @@ export function HeroSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-500/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-muted-foreground backdrop-blur w-fit"
+              className="inline-flex items-center gap-2 rounded-full border border-brand/20 bg-brand/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-muted-foreground backdrop-blur w-fit"
             >
               {/* Small glowing dot to the left of the badge text */}
               <span
                 aria-hidden
-                className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.35)] animate-pulse"
+                className="inline-block w-1.5 h-1.5 rounded-full bg-brand shadow-[0_0_10px_rgba(16,185,129,0.35)] animate-pulse"
               />
               {heroData.badge.text}
             </motion.div>
@@ -90,7 +90,7 @@ export function HeroSection() {
               transition={{ duration: 0.5 }}
               className="space-y-6"
             >
-              <h1 className="text-4xl font-bold  tracking-tight text-emerald-300 sm:text-5xl lg:text-6xl">
+              <h1 className="text-4xl font-bold  tracking-tight text-brand sm:text-5xl lg:text-6xl">
                 {heroData.heading.name}
               </h1>
               <p className="text-2xl font-medium text-muted-foreground sm:text-3xl">
@@ -207,7 +207,7 @@ function CodeTerminal({ heroData }: { heroData: HeroData }) {
           <span className="text-white">engineer</span>&nbsp;
           <span className="text-cyan-400">=</span>&nbsp;
           <span className="text-yellow-400">new</span>&nbsp;
-          <span className="text-brand-accent">SoftwareEngineer</span>
+          <span className="text-[#22ffae]">SoftwareEngineer</span>
           <span className="text-white">();</span>
         </>
       ),
@@ -244,7 +244,7 @@ function CodeTerminal({ heroData }: { heroData: HeroData }) {
       content: (
         <>
           <span className="text-pink-400">name: </span>
-          <span className="text-brand-accent">"Amir Hamza"</span>
+          <span className="text-[#5EE9B5]">"Amir Hamza"</span>
           <span className="text-white">,</span>
         </>
       ),
@@ -254,7 +254,7 @@ function CodeTerminal({ heroData }: { heroData: HeroData }) {
       content: (
         <>
           <span className="text-pink-400">title: </span>
-          <span className="text-brand-accent">"Software Engineer (L1)"</span>
+          <span className="text-[#5EE9B5]">"Software Engineer (L1)"</span>
           <span className="text-white">,</span>
         </>
       ),
@@ -272,17 +272,17 @@ function CodeTerminal({ heroData }: { heroData: HeroData }) {
       indent: 4,
       content: (
         <div className="">
-          <span className="text-brand-accent">"React"</span>
+          <span className="text-[#5EE9B5]">"React"</span>
           <span className="text-white">, </span>
-          <span className="text-brand-accent">"Next.js"</span>
+          <span className="text-[#5EE9B5]">"Next.js"</span>
           <span className="text-white">, </span>
-          <span className="text-brand-accent">"TypeScript"</span>
+          <span className="text-[#5EE9B5]">"TypeScript"</span>
           <span className="text-white">,</span>
-          <span className="text-brand-accent">"Node.js"</span>
+          <span className="text-[#5EE9B5]">"Node.js"</span>
           <span className="text-white">, </span>
-          <span className="text-brand-accent">"Express.js"</span>
+          <span className="text-[#5EE9B5]">"Express.js"</span>
           <span className="text-white">, </span>
-          <span className="text-brand-accent">"MongoDB"</span>
+          <span className="text-[#5EE9B5]">"MongoDB"</span>
         </div>
       ),
     },
@@ -311,7 +311,7 @@ function CodeTerminal({ heroData }: { heroData: HeroData }) {
       indent: 4,
       content: (
         <>
-          <span className="text-brand-accent">
+          <span className="text-[#5EE9B5]">
             "Engineering robust, scalable platforms with exceptional user
             experience."
             <span className="text-white">,</span>
@@ -324,7 +324,7 @@ function CodeTerminal({ heroData }: { heroData: HeroData }) {
       content: (
         <div className="flex ">
           <span className="text-pink-400">focus: </span>
-          <span className="text-brand-accent">
+          <span className="text-[#5EE9B5]">
             "Platform Engineering & Modern Frontend Architecture"
             <span className="text-white">,</span>
           </span>
@@ -336,7 +336,7 @@ function CodeTerminal({ heroData }: { heroData: HeroData }) {
       content: (
         <div className="flex ">
           <span className="text-pink-400">currentlyBuilding: </span>
-          <span className="text-brand-accent">
+          <span className="text-[#5EE9B5]">
             "Next-generation full-stack web applications"
             <span className="text-white">,</span>
           </span>
@@ -405,13 +405,13 @@ function CodeTerminal({ heroData }: { heroData: HeroData }) {
               {line.content}
               {/* Show cursor on current line during streaming */}
               {currentLine === index && !isStreamingComplete && showCursor && (
-                <span className="ml-0.5 inline-block h-4 w-2 bg-brand-accent animate-pulse" />
+                <span className="ml-0.5 inline-block h-4 w-2 bg-[#5EE9B5] animate-pulse" />
               )}
               {/* Show permanent blinking cursor at end of last line after streaming */}
               {index === codeLines.length - 1 &&
                 isStreamingComplete &&
                 showCursor && (
-                  <span className="ml-0.5 inline-block h-4 w-2 bg-brand-accent" />
+                  <span className="ml-0.5 inline-block h-4 w-2 bg-[#5EE9B5]" />
                 )}
             </motion.div>
           ))}

@@ -3,7 +3,9 @@ import "./globals.css";
 
 import { QueryProvider } from "@/components/providers/query-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { SettingsDrawer } from "@/components/settings-drawer";
 import { Toaster } from "@/components/ui/sonner";
+import { SettingsProvider } from "@/contexts/settings-context";
 import type { Metadata } from "next";
 
 const geistSans = Geist({
@@ -35,14 +37,32 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&family=Lora:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700;800&family=Source+Sans+3:wght@300;400;500;600;700;800&family=Work+Sans:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} relative min-h-screen overflow-x-hidden bg-background font-sans text-foreground antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <QueryProvider>
-            {children}
-            <Toaster />
-          </QueryProvider>
+          <SettingsProvider>
+            <QueryProvider>
+              {children}
+              <Toaster />
+
+              <div className="hidden">
+                <SettingsDrawer />
+              </div>
+            </QueryProvider>
+          </SettingsProvider>
         </ThemeProvider>
       </body>
     </html>

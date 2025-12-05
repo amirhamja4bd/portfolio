@@ -72,6 +72,7 @@ export function SkillFormModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string>("");
+  const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isEditing = !!skill;
 
@@ -203,6 +204,76 @@ export function SkillFormModal({
       fileInputRef.current.value = "";
     }
     toast.success("Logo removed successfully");
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+
+    const files = e.dataTransfer.files;
+    if (files.length === 0) return;
+
+    const file = files[0];
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file");
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File size should not exceed 5MB");
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+
+      // Create FormData
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("type", "skills");
+
+      // Upload to server
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const data = await response.json();
+
+      if (data.success && data.data?.url) {
+        // Update form value
+        form.setValue("logo", data.data.url);
+        setLogoPreview(data.data.url);
+        toast.success("Logo uploaded successfully");
+      } else {
+        throw new Error(data.message || "Upload failed");
+      }
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      toast.error(error.message || "Failed to upload logo");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const onSubmit = async (data: SkillFormValues) => {
@@ -383,7 +454,14 @@ export function SkillFormModal({
                         {/* Square Upload Area */}
                         <div
                           onClick={() => fileInputRef.current?.click()}
-                          className="relative w-24 h-24 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors flex items-center justify-center bg-muted/50 hover:bg-muted group"
+                          onDragOver={handleDragOver}
+                          onDragLeave={handleDragLeave}
+                          onDrop={handleDrop}
+                          className={`relative w-24 h-24 border-2 border-dashed rounded-lg cursor-pointer transition-colors flex items-center justify-center group ${
+                            isDragOver
+                              ? "border-primary bg-primary/10 scale-105"
+                              : "border-border bg-muted/50 hover:bg-muted hover:border-primary"
+                          }`}
                         >
                           {logoPreview ? (
                             <>
@@ -420,7 +498,7 @@ export function SkillFormModal({
                         {/* Upload Info */}
                         <div className="flex-1">
                           <p className="text-sm text-muted-foreground mb-1">
-                            Click the square to upload a logo image
+                            Click to upload or drag and drop a logo image
                           </p>
                           <p className="text-xs text-muted-foreground">
                             PNG, JPG, WebP or GIF (max. 5MB)

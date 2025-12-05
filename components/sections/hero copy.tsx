@@ -83,7 +83,7 @@
 //               transition={{ duration: 0.5, delay: 0.2 }}
 //               className="mb-6"
 //             >
-//               <span className="text-brand-accent">amir@portfolio</span>
+//               <span className="text-brand">amir@portfolio</span>
 //               <span className="text-zinc-400">:</span>
 //               <span className="text-blue-400">~</span>
 //               <span className="text-zinc-400">$</span>
@@ -104,7 +104,7 @@
 //               <div className="ml-4">
 //                 <span className="text-purple-400">"name"</span>
 //                 <span className="text-zinc-500">: </span>
-//                 <span className="text-brand-accent">
+//                 <span className="text-brand">
 //                   "{heroData.heading.name}"
 //                 </span>
 //                 <span className="text-zinc-500">,</span>
@@ -112,7 +112,7 @@
 //               <div className="ml-4">
 //                 <span className="text-purple-400">"role"</span>
 //                 <span className="text-zinc-500">: </span>
-//                 <span className="text-brand-accent">
+//                 <span className="text-brand">
 //                   "{heroData.heading.title}"
 //                 </span>
 //                 <span className="text-zinc-500">,</span>
@@ -120,7 +120,7 @@
 //               <div className="ml-4">
 //                 <span className="text-purple-400">"bio"</span>
 //                 <span className="text-zinc-500">: </span>
-//                 <span className="text-brand-accent">"{heroData.bio}"</span>
+//                 <span className="text-brand">"{heroData.bio}"</span>
 //                 <span className="text-zinc-500">,</span>
 //               </div>
 //               <div className="ml-4">
@@ -162,14 +162,14 @@
 //               transition={{ duration: 0.6, delay: 0.6 }}
 //               className="mt-8 flex items-center gap-2"
 //             >
-//               <span className="text-brand-accent">amir@portfolio</span>
+//               <span className="text-brand">amir@portfolio</span>
 //               <span className="text-zinc-400">:</span>
 //               <span className="text-blue-400">~</span>
 //               <span className="text-zinc-400">$</span>
 //               <motion.span
 //                 animate={{ opacity: [1, 0, 1] }}
 //                 transition={{ duration: 1, repeat: Infinity }}
-//                 className="ml-2 inline-block h-5 w-2 bg-brand-accent"
+//                 className="ml-2 inline-block h-5 w-2 bg-brand"
 //               />
 //             </motion.div>
 
@@ -183,7 +183,7 @@
 //               <Button
 //                 size="lg"
 //                 asChild
-//                 className="min-w-[180px] bg-brand-accent hover:bg-brand-accent/70"
+//                 className="min-w-[180px] bg-brand hover:bg-brand/70"
 //               >
 //                 <a href={heroData.cta.primary.href}>
 //                   {heroData.cta.primary.text}
@@ -236,7 +236,6 @@
 //     </div>
 //   );
 // }
-
 
 "use client";
 

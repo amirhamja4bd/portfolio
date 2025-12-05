@@ -89,7 +89,7 @@ export function SiteHeader() {
           href="/"
           className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.3em]"
         >
-          <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.6)]" />
+          <span className="h-2 w-2 rounded-full bg-brand shadow-[0_0_12px_rgba(52,211,153,0.6)]" />
           {siteConfig.name}
         </Link>
         <nav className="hidden items-center gap-8 md:flex">
@@ -100,7 +100,7 @@ export function SiteHeader() {
               className={cn(
                 "text-sm font-medium transition hover:text-foreground relative",
                 activeSection === item.id
-                  ? "text-emerald-400"
+                  ? "text-brand"
                   : "text-muted-foreground",
                 pathname === "/" ? "" : "opacity-70"
               )}
@@ -109,7 +109,7 @@ export function SiteHeader() {
               {activeSection === item.id && (
                 <motion.span
                   layoutId="activeSection"
-                  className="absolute -bottom-[17px] left-0 right-0 h-0.5 bg-emerald-400"
+                  className="absolute -bottom-[17px] left-0 right-0 h-0.5 bg-brand"
                   initial={false}
                   transition={{ type: "spring", stiffness: 380, damping: 30 }}
                 />

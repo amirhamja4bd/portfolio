@@ -104,10 +104,10 @@ export function ContactSection() {
                 <a
                   key={channel.label}
                   href={channel.href}
-                  className="group flex items-center justify-between rounded-2xl border border-border/60 bg-background/70 p-4 transition hover:border-emerald-400 hover:bg-background/90"
+                  className="group flex items-center justify-between rounded-2xl border border-border/60 bg-background/70 p-4 transition hover:border-brand hover:bg-background/90"
                 >
                   <div className="flex items-center gap-4">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand/10 text-brand">
                       <Icon className="h-5 w-5" />
                     </span>
                     <div>
@@ -119,7 +119,7 @@ export function ContactSection() {
                       </p>
                     </div>
                   </div>
-                  <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground/70 group-hover:text-emerald-400">
+                  <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground/70 group-hover:text-brand">
                     Connect
                   </span>
                 </a>

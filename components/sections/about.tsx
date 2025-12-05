@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import DynamicIcon from "../dynamic-icon/DynamicIcon";
 import AboutSkeleton from "../skeleton/AboutSkeleton";
 
 type TabType = "snapshot" | "education" | "certifications" | "interests";
@@ -389,7 +390,11 @@ export function AboutSection() {
                           className="rounded-lg bg-background/50 p-3"
                         >
                           <p className="font-medium text-foreground">
-                            {interest.icon} {interest.title}
+                            <DynamicIcon
+                              name={interest.icon}
+                              className="text-brand bg-brand/15 rounded-sm p-1.5 text-2xl w-8 h-8"
+                            />{" "}
+                            {interest.title}
                           </p>
                           <p className="text-xs mt-1">{interest.description}</p>
                         </div>

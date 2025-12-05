@@ -1,5 +1,4 @@
 "use client";
-import useSettings from "@/hooks/useSettings";
 import { useTheme } from "next-themes";
 import React, { useCallback, useEffect, useState } from "react";
 import { ThemeToggleButton, useThemeTransition } from "./ThemeToggleButton";
@@ -10,8 +9,7 @@ interface ThemeToggleProps {
 }
 
 const ThemeToggle: React.FC<ThemeToggleProps> = ({ type }) => {
-  const { setTheme } = useTheme();
-  const { settings, updateSettings } = useSettings();
+  const { theme, setTheme } = useTheme();
   const { startTransition } = useThemeTransition();
   const [mounted, setMounted] = useState(false);
 
@@ -20,27 +18,15 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ type }) => {
   }, []);
 
   const handleThemeToggle = useCallback(() => {
-    const newMode: any = settings.mode === "dark" ? "light" : "dark";
+    const newTheme = theme === "dark" ? "light" : "dark";
 
     startTransition(() => {
-      const updatedSettings = {
-        ...settings,
-        mode: newMode,
-        theme: {
-          ...settings.theme,
-          styles: {
-            light: settings.theme.styles?.light || {},
-            dark: settings.theme.styles?.dark || {},
-          },
-        },
-      };
-      updateSettings(updatedSettings);
-      setTheme(newMode);
+      setTheme(newTheme);
     });
-  }, [settings, updateSettings, setTheme, startTransition]);
+  }, [theme, setTheme, startTransition]);
 
   const currentTheme =
-    settings.mode === "system" ? "light" : (settings.mode as "light" | "dark");
+    theme === "system" ? "light" : (theme as "light" | "dark");
 
   if (!mounted) {
     return null;

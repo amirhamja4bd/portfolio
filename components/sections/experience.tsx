@@ -127,7 +127,7 @@ export function ExperienceSection() {
               }}
               className="relative md:pl-16"
             >
-              <span className="absolute left-2.5 top-0 hidden h-3 w-3 rounded-full border-2 border-background bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.6)] md:block" />
+              <span className="absolute left-2.5 top-0 hidden h-3 w-3 rounded-full border-2 border-background bg-brand shadow-[0_0_12px_rgba(52,211,153,0.6)] md:block" />
               <div className="flex flex-col gap-6 rounded-3xl border border-border/60 bg-background/75 p-8 shadow-lg backdrop-blur md:flex-row md:items-start">
                 <div className="flex w-full shrink-0 items-center gap-4 md:w-48 md:flex-col md:items-start">
                   <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-border/60 bg-background/80">
@@ -170,7 +170,7 @@ export function ExperienceSection() {
                       <ul className="space-y-3 text-sm text-muted-foreground">
                         {role.responsibilities.map((item, idx) => (
                           <li key={idx} className="flex items-start gap-3">
-                            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" />
+                            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
                             {item}
                           </li>
                         ))}

@@ -65,7 +65,7 @@ export function BlogSection() {
               </span>
               <span>{post.readingTime}</span>
             </div>
-            <h3 className="mt-4 text-xl font-semibold text-foreground transition group-hover:text-emerald-400">
+            <h3 className="mt-4 text-xl font-semibold text-foreground transition group-hover:text-brand">
               {post.title}
             </h3>
             <p className="mt-3 text-sm text-muted-foreground">{post.excerpt}</p>
