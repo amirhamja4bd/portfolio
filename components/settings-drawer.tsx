@@ -26,7 +26,7 @@ import { useEffect, useState } from "react";
 const colorSchemes: { value: ThemeColor; label: string; color: string }[] = [
   { value: "default", label: "Default", color: "bg-zinc-900 dark:bg-zinc-100" },
   { value: "emerald", label: "Emerald", color: "bg-emerald-500" },
-  { value: "sky", label: "Sky Blue", color: "bg-sky-500" },
+  { value: "sky", label: "Sky Blue", color: "bg-[#38bdf8]" },
   { value: "violet", label: "Violet", color: "bg-violet-500" },
   { value: "rose", label: "Rose", color: "bg-rose-500" },
   { value: "amber", label: "Amber", color: "bg-amber-500" },

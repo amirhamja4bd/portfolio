@@ -3,6 +3,7 @@ import "./globals.css";
 
 import { QueryProvider } from "@/components/providers/query-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import ScrollProgress from "@/components/seroll/scroll";
 import { SettingsDrawer } from "@/components/settings-drawer";
 import { Toaster } from "@/components/ui/sonner";
 import { SettingsProvider } from "@/contexts/settings-context";
@@ -61,6 +62,7 @@ export default function RootLayout({
               <div className="hidden">
                 <SettingsDrawer />
               </div>
+              <ScrollProgress />
             </QueryProvider>
           </SettingsProvider>
         </ThemeProvider>

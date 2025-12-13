@@ -115,6 +115,28 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+html {
+  scrollbar-width: none;
+  scroll-behavior: smooth !important;
+  background: var(--body2);
+  /* background: var(--gradientBg); */
+}
+
+body {
+  background: var(--gradientBg);
+  color: var(--primaryText);
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbarHide::-webkit-scrollbar {
+  display: none;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -125,13 +147,6 @@
   }
 }
 
-/* Brand utility helpers (single RGB variable + opacity variants)
-   Usage examples:
-     class="bg-brandColor" -> solid brand color
-     class="bg-brandColor/12" -> 12% alpha
-     class="bg-brandColor/25" -> 25% alpha
-   These classes are small helpers so you can reuse the single --brandColor variable
-*/
 @layer utilities {
   .bg-brandColor {
     background-color: oklch(var(--brandColor)) !important;

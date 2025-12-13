@@ -64,17 +64,18 @@ const themeColorValues: Record<
       brandColor: "oklch(85.8% 0.194 163.8)",
     },
   },
-  // Sky Blue - Calm and refreshing
+  // Sky Blue - #38bdf8
   sky: {
     light: {
-      primary: "oklch(0.65 0.15 235)",
+      primary: "oklch(72.58% 0.155 237.69)",
+      // primaryForeground: "oklch(0.15 0 0)",
       primaryForeground: "oklch(0.99 0 0)",
-      brandColor: "oklch(0.55 0.2 220)",
+      brandColor: "oklch(72.58% 0.155 237.69)",
     },
     dark: {
-      primary: "oklch(0.75 0.13 235)",
+      primary: "oklch(72.58% 0.155 237.69)",
       primaryForeground: "oklch(0.15 0 0)",
-      brandColor: "oklch(0.55 0.2 220)",
+      brandColor: "oklch(72.58% 0.155 237.69)",
     },
   },
   // Violet - Modern and elegant

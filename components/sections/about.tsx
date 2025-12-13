@@ -197,7 +197,7 @@ export function AboutSection() {
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
+          viewport={{ margin: "-50px" }}
           transition={{ duration: 0.7, ease: "easeOut" }}
           className="space-y-6"
         >
@@ -226,7 +226,7 @@ export function AboutSection() {
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
+          viewport={{ margin: "-60px" }}
           transition={{ duration: 0.7, ease: "easeOut", delay: 0.15 }}
           className="space-y-4"
         >

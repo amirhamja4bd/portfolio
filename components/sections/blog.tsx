@@ -37,9 +37,9 @@ export function BlogSection() {
             engineering teams.
           </p>
         </div>
-        <Button asChild variant="outline">
+        <Button asChild variant="outline" className="shrink-0 group">
           <Link href="/blogs" className="flex items-center gap-2">
-            View all posts <ArrowRight className="h-4 w-4" />
+            View all posts <ArrowRight className="h-4 w-4 group-hover:-rotate-45 transition-all ease-in-out" />
           </Link>
         </Button>
       </div>
@@ -49,7 +49,7 @@ export function BlogSection() {
             key={post.id}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
+            viewport={{ margin: "-60px" }}
             transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
             className="group flex flex-col rounded-3xl border border-border/60 bg-background/70 p-6 shadow-lg backdrop-blur"
           >

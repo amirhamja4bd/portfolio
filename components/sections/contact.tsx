@@ -84,7 +84,7 @@ export function ContactSection() {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
+          viewport={{ margin: "-60px" }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="space-y-6"
         >
@@ -131,7 +131,7 @@ export function ContactSection() {
           onSubmit={form.handleSubmit(onSubmit)}
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
+          viewport={{ margin: "-60px" }}
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
           className="space-y-5 rounded-3xl border border-border/60 bg-background/75 p-8 shadow-xl backdrop-blur"
         >

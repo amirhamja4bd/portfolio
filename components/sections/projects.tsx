@@ -74,10 +74,10 @@ export function ProjectsSection() {
           </h2>
           <p className="text-muted-foreground">{projectsData.description}</p>
         </div>
-        <Button asChild className="shrink-0" variant="outline">
+        <Button asChild className="shrink-0 group" variant="outline">
           <Link href="/projects" className="flex items-center gap-2">
-            View all projects <ArrowRight className="h-4 w-4" />
-            <ArrowUpRight className="ml-2 h-4 w-4" />
+            View all projects{" "}
+            <ArrowRight className="h-4 w-4 group-hover:-rotate-45 transition-all ease-in-out" />
           </Link>
         </Button>
       </div>
@@ -104,7 +104,7 @@ export function ProjectsSection() {
               key={project.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
+              viewport={{ margin: "-80px" }}
               transition={{
                 duration: 0.5,
                 ease: "easeOut",
