@@ -1,13 +1,13 @@
-import ProjectsList from "@/components/projects/ProjectsList";
+import { ProjectsSection } from "@/components/projects/new/NewProjectPage";
 
 type Props = {};
 
-const page = ({}: Props) => {
+const ProjectPage = ({}: Props) => {
   return (
-    <div className="py-5">
-      <ProjectsList />
+    <div>
+      <ProjectsSection />
     </div>
   );
 };
 
-export default page;
+export default ProjectPage;

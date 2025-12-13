@@ -26,7 +26,7 @@ const ScrollProgress: React.FC = () => {
       {/* Top bar */}
       <div className="fixed inset-y-0 right-0 z-500000000000">
         <div
-          className="w-1 bg-primaryColor"
+          className="w-1 bg-primary"
           style={{ height: `${percent}%` }}
         ></div>
       </div>
