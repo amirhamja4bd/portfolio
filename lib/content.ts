@@ -194,6 +194,7 @@ export interface BlogPostPreview {
   category?: string; // Optional for backward compatibility
   publishedAt: string;
   thumbnail?: string;
+  featured?: boolean;
   // Legacy fields for static demo data
   excerpt?: string;
   readingTime?: string;

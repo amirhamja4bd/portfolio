@@ -177,6 +177,14 @@ body::-webkit-scrollbar {
   .ring-brandColor {
     box-shadow: 0 0 0 3px oklch(var(--brandColor) / 0.12) !important;
   }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
 /* Prose/Markdown Styling */
