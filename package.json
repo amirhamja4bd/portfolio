@@ -9,7 +9,8 @@
     "lint": "eslint",
     "seed": "tsx lib/seed.ts",
     "seed:hero": "tsx lib/seed-hero.ts",
-    "seed:about": "tsx lib/seed-about.ts"
+    "seed:about": "tsx lib/seed-about.ts",
+    "seed:stats": "tsx scripts/seed-stats.ts"
   },
   "dependencies": {
     "@editorjs/code": "^2.9.3",

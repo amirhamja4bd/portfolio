@@ -373,7 +373,7 @@ export function AIChatAssistant() {
               )}
               ref={scrollRef}
             >
-              <div className="space-y-5 mt-2">
+              <div className="space-y-5 mt-2 pb-2">
                 {messages.map((message, index) => (
                   <motion.div
                     key={message.id}
@@ -523,6 +523,7 @@ export function AIChatAssistant() {
                 ))}
                 {isTyping && <TypingIndicator compact={isCompact} />}
               </div>
+              
             </ScrollArea>
 
             {/* Input */}

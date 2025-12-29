@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  BarChart3,
   Briefcase,
   ChevronsUpDown,
   Code,
@@ -64,6 +65,11 @@ const navigationItems = [
     name: "Projects",
     href: "/dashboard/projects",
     icon: Briefcase,
+  },
+  {
+    name: "Project Stats",
+    href: "/dashboard/stats",
+    icon: BarChart3,
   },
   {
     name: "Skills",

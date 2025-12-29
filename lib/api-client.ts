@@ -266,5 +266,16 @@ export const uploadApi = {
   uploadForEditorJS: (file: File) => api.upload("/api/upload/editorjs", file),
 };
 
+/**
+ * Stats API
+ */
+export const statsApi = {
+  get: () => api.get("/api/stats"),
+  update: (data: {
+    items: { label: string; value: string; order?: number }[];
+    description?: string;
+  }) => api.post("/api/stats", data),
+};
+
 export { ApiError };
 export type { ApiResponse };

@@ -1,6 +1,6 @@
 "use client";
 
-import { projectApi } from "@/lib/api-client";
+import { projectApi, statsApi } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Filter, LayoutGrid, List } from "lucide-react";
@@ -34,7 +34,25 @@ export function ProjectsSection() {
     },
   });
 
+  // Fetch stats from API
+  const { data: statsResponse } = useQuery({
+    queryKey: ["stats"],
+    queryFn: () => statsApi.get(),
+  });
+
   const projects = apiResponse?.data?.data || [];
+  const stats =
+    statsResponse?.data?.items && statsResponse.data.items.length > 0
+      ? statsResponse.data.items
+      : [
+          { value: "50+", label: "Projects Completed" },
+          { value: "30+", label: "Happy Clients" },
+          { value: "5+", label: "Years Experience" },
+        ];
+
+  const projectDescription =
+    statsResponse?.data?.description ||
+    "A curated collection of projects showcasing innovative solutions, from full-stack applications to AI-powered platforms. Each project represents a unique challenge conquered with creativity and precision.";
 
   useEffect(() => {
     setIsLoaded(true);
@@ -43,10 +61,10 @@ export function ProjectsSection() {
   const filteredProjects =
     activeCategory === "All"
       ? projects
-      : projects.filter((p:any) => p.category === activeCategory);
+      : projects.filter((p: any) => p.category === activeCategory);
 
-  const featuredProjects = filteredProjects.filter((p:any) => p.featured);
-  const regularProjects = filteredProjects.filter((p:any) => !p.featured);
+  const featuredProjects = filteredProjects.filter((p: any) => p.featured);
+  const regularProjects = filteredProjects.filter((p: any) => !p.featured);
 
   return (
     <section className="min-h-screen relative">
@@ -92,10 +110,7 @@ export function ProjectsSection() {
             className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-5xl mx-auto opacity-0 animate-fade-up delay-200 text-center"
             style={{ animationFillMode: "forwards" }}
           >
-            A curated collection of projects showcasing innovative solutions,
-            from full-stack applications to AI-powered platforms. Each project
-            represents a unique challenge conquered with creativity and
-            precision.
+            {projectDescription}
           </p>
 
           {/* Stats row */}
@@ -103,11 +118,7 @@ export function ProjectsSection() {
             className="flex flex-wrap gap-8 mt-12 justify-center opacity-0 animate-fade-up delay-300"
             style={{ animationFillMode: "forwards" }}
           >
-            {[
-              { value: "50+", label: "Projects Completed" },
-              { value: "30+", label: "Happy Clients" },
-              { value: "5+", label: "Years Experience" },
-            ].map((stat, idx) => (
+            {stats.map((stat: any, idx: number) => (
               <div key={idx} className="flex items-baseline gap-2">
                 <span className="text-3xl md:text-4xl font-bold text-foreground">
                   {stat.value}
@@ -178,7 +189,7 @@ export function ProjectsSection() {
           {/* Featured projects */}
           {featuredProjects.length > 0 && (
             <div className="grid gap-6">
-              {featuredProjects.map((project:any, index:any) => (
+              {featuredProjects.map((project: any, index: any) => (
                 <ProjectCard
                   key={project.id}
                   project={project}
@@ -198,7 +209,7 @@ export function ProjectsSection() {
                 : "grid-cols-1"
             )}
           >
-            {regularProjects.map((project:any, index:any) => (
+            {regularProjects.map((project: any, index: any) => (
               <ProjectCard
                 key={project.id}
                 project={project}
