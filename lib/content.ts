@@ -209,7 +209,7 @@ export interface BlogPost extends BlogPostPreview {
     role: string;
   };
   images?: string[];
-  views?: number;
+  viewsCount?: number;
   reactionsCount?: {
     1?: number;
     2?: number;

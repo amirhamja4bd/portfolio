@@ -51,10 +51,14 @@ export function AnimatedBackground() {
         <div
           className="absolute inset-0 animate-[pulse_10s_linear_infinite]"
           style={{
+            // backgroundImage: `
+            //   linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px),
+            //   linear-gradient(90deg, rgba(255,255,255,0.10) 1px, transparent 1px)
+            // `,
             backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.10) 1px, transparent 1px)
-            `,
+                  linear-gradient(rgba(34,211,238,0.25) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(168,85,247,0.25) 1px, transparent 1px)
+                `,
             backgroundSize: "48px 48px",
             maskImage:
               "radial-gradient(circle at 50% 50%, rgba(255,255,255,0.25) 60%, transparent 100%)",

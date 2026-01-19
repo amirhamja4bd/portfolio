@@ -1,7 +1,6 @@
 "use client";
 
 import { blogApi } from "@/lib/api-client";
-import type { BlogPost } from "@/lib/content";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
@@ -25,6 +24,7 @@ import { BlogCard } from "@/components/blogs/blog-card";
 import BlogListSkeleton from "@/components/skeleton/BlogListSkeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { BlogPost } from "@/lib/content";
 
 type SortOption = "latest" | "oldest" | "popular";
 

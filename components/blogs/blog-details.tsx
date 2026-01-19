@@ -25,8 +25,7 @@ import {
   ArrowRight,
   ThumbsUp,
 } from "lucide-react"
-import type { BlogPost } from "@/lib/blogs-data"
-import { getRelatedPosts } from "@/lib/blogs-data"
+import { BlogPost, getRelatedPosts } from "./blogs-data"
 
 interface BlogDetailsProps {
   post: BlogPost

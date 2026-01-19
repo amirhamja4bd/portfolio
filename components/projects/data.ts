@@ -36,6 +36,11 @@ export interface Project {
   metrics?: { label: string; value: string }[];
   createdAt: string;
   updatedAt: string;
+  year?: string;
+  longDescription?: string;
+  duration?: string;
+  teamSize?: string;
+  role?: string;
 }
 
 // Note: Static data removed - now using API data from /api/projects

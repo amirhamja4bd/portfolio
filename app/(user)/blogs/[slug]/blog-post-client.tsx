@@ -18,9 +18,10 @@ import { toast } from "sonner";
 import BlogReactions from "@/components/blog-reactions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { BlogPost } from "@/lib/content";
 import MarkdownPreview from "@/lib/MarkdownPreview";
 import { timeAgo } from "@/lib/utils";
+import { BlogPost } from "@/lib/content";
+
 
 interface BlogPostClientProps {
   post: BlogPost;
@@ -34,6 +35,8 @@ export default function BlogPostClient({
   const htmlContentRef = useRef<HTMLDivElement | null>(null);
   const [readingProgress, setReadingProgress] = useState(0);
   const [isShareMenuOpen, setIsShareMenuOpen] = useState(false);
+  const shareMenuRef = useRef<HTMLDivElement>(null);
+  const [views, setViews] = useState(post.viewsCount || 0);
   const [reactions, setReactions] = useState(
     post.reactionsCount || {
       1: 0,
@@ -99,6 +102,7 @@ export default function BlogPostClient({
         if (data?.reactionsCount) setReactions(data.reactionsCount);
         if (data?.visitorReaction !== undefined)
           setSelectedReaction(data.visitorReaction);
+        if (data?.viewsCount !== undefined) setViews(data.viewsCount);
       } catch (e) {
         // ignore
       }
@@ -126,7 +130,28 @@ export default function BlogPostClient({
     };
     fetchComments();
     return () => controller.abort();
+    return () => controller.abort();
   }, [post.slug]);
+
+  // Close share menu on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        shareMenuRef.current &&
+        !shareMenuRef.current.contains(event.target as Node)
+      ) {
+        setIsShareMenuOpen(false);
+      }
+    };
+
+    if (isShareMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isShareMenuOpen]);
 
   // Visible comments merges pending optimistic comments and approved
   // server-side comments fetched from the API.
@@ -314,7 +339,7 @@ export default function BlogPostClient({
         </Button>
 
         <div className="flex items-center gap-2">
-          <div className="relative">
+          <div className="relative" ref={shareMenuRef}>
             <Button
               variant="outline"
               size="sm"
@@ -335,6 +360,7 @@ export default function BlogPostClient({
                     href={shareLinks.twitter}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => setIsShareMenuOpen(false)}
                   >
                     <Twitter className="mr-2 h-4 w-4" />
                     Twitter
@@ -350,6 +376,7 @@ export default function BlogPostClient({
                     href={shareLinks.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => setIsShareMenuOpen(false)}
                   >
                     <Linkedin className="mr-2 h-4 w-4" />
                     LinkedIn
@@ -358,7 +385,10 @@ export default function BlogPostClient({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={copyToClipboard}
+                  onClick={() => {
+                    copyToClipboard();
+                    setIsShareMenuOpen(false);
+                  }}
                   className="justify-start"
                 >
                   <LinkIcon className="mr-2 h-4 w-4" />
@@ -409,10 +439,10 @@ export default function BlogPostClient({
                   {post.readingTime}
                 </span>
               )}
-              {post.views && (
+              {views > 0 && (
                 <span className="flex items-center gap-1">
                   <Eye className="h-4 w-4" />
-                  {post.views.toLocaleString()} views
+                  {views.toLocaleString()} views
                 </span>
               )}
             </div>
@@ -470,14 +500,17 @@ export default function BlogPostClient({
             className="mb-12 flex items-center gap-4 rounded-2xl border bg-muted/50 p-6"
           >
             <img
-              src={post.author.avatar}
+              src={
+                post.author.avatar ||
+                "https://raw.githubusercontent.com/amirhamja4bd/public_images/refs/heads/main/Amir_Hamza.png"
+              }
               alt={post.author.name}
               className="h-16 w-16 rounded-full object-cover"
             />
             <div>
               <p className="font-semibold">{post.author.name}</p>
               <p className="text-sm text-muted-foreground">
-                {post.author.role}
+                {post.author.role || "Software Engineer (Frontend)"}
               </p>
             </div>
           </motion.div>

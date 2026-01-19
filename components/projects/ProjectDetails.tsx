@@ -84,7 +84,7 @@ function InfoCard({
 }: {
   icon: React.ElementType;
   label: string;
-  value: string;
+  value?: string;
   delay: number;
 }) {
   return (

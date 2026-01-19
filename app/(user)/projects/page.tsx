@@ -1,4 +1,4 @@
-import { ProjectsSection } from "@/components/projects/new/NewProjectPage";
+import { ProjectsSection } from "@/components/projects/NewProjectPage";
 
 type Props = {};
 

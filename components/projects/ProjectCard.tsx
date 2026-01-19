@@ -107,7 +107,7 @@ export function ProjectCard({
                     {project.category}
                   </span>
                   <span className="text-muted-foreground text-sm">
-                    {project.year}
+                    {/* {project.year} */}
                   </span>
                 </div>
 
@@ -118,7 +118,7 @@ export function ProjectCard({
 
                 {/* Description */}
                 <p className="text-muted-foreground text-lg leading-relaxed">
-                  {project.longDescription}
+                  {/* {project.longDescription} */}
                 </p>
 
                 {/* Tech Stack */}
@@ -190,7 +190,7 @@ export function ProjectCard({
 
           {/* Year badge */}
           <div className="absolute top-4 left-4 px-3 py-1 rounded-full glass text-xs font-medium text-foreground">
-            {project.year}
+            {/* {project.year} */}
           </div>
 
           {/* Hover overlay with icon */}
