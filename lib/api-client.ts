@@ -41,7 +41,7 @@ async function apiRequest<T = any>(
 ): Promise<ApiResponse<T>> {
   const url = endpoint.startsWith("http")
     ? endpoint
-    : `${API_BASE_URL}${endpoint}`;
+    : `${endpoint}`;
 
   const config: RequestInit = {
     ...options,
