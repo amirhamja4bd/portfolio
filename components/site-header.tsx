@@ -24,7 +24,7 @@ export function SiteHeader() {
         if (response.ok) {
           const result = await response.json();
           const primaryResume = result.data?.resumes?.find(
-            (r: any) => r.isPrimary
+            (r: any) => r.isPrimary,
           );
           if (primaryResume) {
             setResumeUrl(primaryResume.resumeUrl);
@@ -61,7 +61,7 @@ export function SiteHeader() {
           {
             rootMargin: "-20% 0px -80% 0px",
             threshold: 0,
-          }
+          },
         );
 
         observer.observe(element);
@@ -110,7 +110,7 @@ export function SiteHeader() {
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-8 md:flex">
           {siteConfig.sections.map((item) => (
-            <a
+            <Link
               key={item.id}
               href={`/#${item.id}`}
               className={cn(
@@ -118,7 +118,7 @@ export function SiteHeader() {
                 activeSection === item.id
                   ? "text-brand"
                   : "text-muted-foreground",
-                pathname === "/" ? "" : "opacity-70"
+                pathname === "/" ? "" : "opacity-70",
               )}
             >
               {item.label}
@@ -130,7 +130,7 @@ export function SiteHeader() {
                   transition={{ type: "spring", stiffness: 380, damping: 30 }}
                 />
               )}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -189,7 +189,7 @@ export function SiteHeader() {
                       "text-lg font-medium transition-colors hover:text-brand",
                       activeSection === item.id
                         ? "text-brand"
-                        : "text-muted-foreground"
+                        : "text-muted-foreground",
                     )}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >

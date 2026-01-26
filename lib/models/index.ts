@@ -10,6 +10,7 @@ import PostView from "./PostView";
 import Project from "./Project";
 import Settings from "./Settings";
 import Skill from "./Skill";
+import Subscriber from "./Subscriber";
 
 export {
   About,
@@ -24,6 +25,7 @@ export {
   Project,
   Settings,
   Skill,
+  Subscriber,
 };
 
 export default {

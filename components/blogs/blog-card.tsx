@@ -74,9 +74,9 @@ export function BlogCard({ post, index, variant = "large" }: BlogCardProps) {
   const config = getCategoryConfig(post.category);
   const CategoryIcon = config.icon;
   const thumbnail = post.thumbnail || post.coverImage || "/placeholder.svg";
-  const authorAvatar = post.author?.avatar || "/placeholder.svg";
-  const authorName = post.author?.name || "Anonymous";
-  const authorRole = post.author?.role || "Contributor";
+  const authorAvatar = post.author?.avatar || "/images/Amir_Hamza.png";
+  const authorName = post.author?.name || "Amir Hamza";
+  const authorRole = post.author?.role || "Software Engineer";
 
   if (variant === "featured") {
     return (
@@ -181,13 +181,13 @@ export function BlogCard({ post, index, variant = "large" }: BlogCardProps) {
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-3">
                   <div className="relative">
-                    <Image
-                      src={authorAvatar}
-                      alt={authorName}
-                      width={48}
-                      height={48}
-                      className="rounded-full ring-2 ring-white/20"
-                    />
+                    <div className="h-10 w-10">
+                      <img
+                        src={authorAvatar}
+                        alt={authorName}
+                        className="rounded-full h-full w-full"
+                      />
+                    </div>
                     <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-green-500 border-2 border-background" />
                   </div>
                   <div>
@@ -264,13 +264,13 @@ export function BlogCard({ post, index, variant = "large" }: BlogCardProps) {
               {post.excerpt}
             </p>
             <div className="flex items-center gap-3">
-              <Image
-                src={authorAvatar}
-                alt={authorName}
-                width={32}
-                height={32}
-                className="rounded-full"
-              />
+              <div className="h-10 w-10">
+                <img
+                  src={authorAvatar}
+                  alt={authorName}
+                  className="rounded-full h-full w-full"
+                />
+              </div>
               <span className="text-sm text-white/80">{authorName}</span>
             </div>
           </div>
@@ -440,13 +440,13 @@ export function BlogCard({ post, index, variant = "large" }: BlogCardProps) {
             {/* Author row */}
             <div className="flex items-center justify-between pt-4 border-t border-border/50">
               <div className="flex items-center gap-2.5">
-                <Image
-                  src={authorAvatar}
-                  alt={authorName}
-                  width={32}
-                  height={32}
-                  className="rounded-full ring-2 ring-border"
-                />
+                <div className="h-10 w-10">
+                  <img
+                    src={authorAvatar}
+                    alt={authorName}
+                    className="rounded-full h-full w-full"
+                  />
+                </div>
                 <div>
                   <p className="text-xs font-medium text-foreground">
                     {authorName}

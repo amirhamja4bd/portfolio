@@ -2,6 +2,7 @@
 
 import type React from "react";
 
+import sanitizeHtml from "@/lib/sanitizeHtml";
 import { ArrowUpRight, Eye, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -22,6 +23,8 @@ export function ProjectCard({
   const cardRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
+
+  console.log({ project });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
@@ -189,9 +192,11 @@ export function ProjectCard({
           <div className="absolute inset-0 bg-linear-to-t from-card via-card/20 to-transparent opacity-60" />
 
           {/* Year badge */}
-          <div className="absolute top-4 left-4 px-3 py-1 rounded-full glass text-xs font-medium text-foreground">
-            {/* {project.year} */}
-          </div>
+          {project?.featured && (
+            <div className="absolute top-4 left-4 px-3 py-1 rounded-full glass text-xs font-medium text-foreground">
+              {project.featured ? "Featured" : ""}
+            </div>
+          )}
 
           {/* Hover overlay with icon */}
           <div className="absolute inset-0 flex items-center justify-center bg-primary/0 group-hover:bg-primary/10 transition-all duration-500">
@@ -214,9 +219,12 @@ export function ProjectCard({
           </h3>
 
           {/* Description */}
-          <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2">
-            {project.description}
-          </p>
+          <div
+            className="text-muted-foreground text-sm leading-relaxed line-clamp-2"
+            dangerouslySetInnerHTML={{
+              __html: sanitizeHtml(project.description),
+            }}
+          />
 
           {/* Tech Stack - Show first 3 */}
           <div className="flex flex-wrap gap-1.5 pt-2">

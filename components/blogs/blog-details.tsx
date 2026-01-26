@@ -1,55 +1,79 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect, useRef } from "react"
-import Link from "next/link"
-import Image from "next/image"
 import {
   ArrowLeft,
-  Calendar,
-  Clock,
-  Share2,
+  ArrowRight,
   Bookmark,
-  Twitter,
-  Linkedin,
-  LinkIcon,
+  Calendar,
+  Check,
   ChevronUp,
+  Clock,
+  Copy,
   Heart,
   Lightbulb,
-  Zap,
-  Sparkles,
-  Check,
-  Copy,
-  Volume2,
+  Linkedin,
+  LinkIcon,
   List,
-  ArrowRight,
+  Share2,
+  Sparkles,
   ThumbsUp,
-} from "lucide-react"
-import { BlogPost, getRelatedPosts } from "./blogs-data"
+  Twitter,
+  Volume2,
+  Zap,
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
+import { BlogPost, getRelatedPosts } from "./blogs-data";
 
 interface BlogDetailsProps {
-  post: BlogPost
+  post: BlogPost;
 }
 
 const reactions = [
-  { id: "like", icon: Heart, label: "Love", color: "text-red-500", bg: "bg-red-500/10" },
-  { id: "insightful", icon: Lightbulb, label: "Insightful", color: "text-amber-500", bg: "bg-amber-500/10" },
-  { id: "mindblown", icon: Zap, label: "Mind Blown", color: "text-purple-500", bg: "bg-purple-500/10" },
-  { id: "helpful", icon: ThumbsUp, label: "Helpful", color: "text-green-500", bg: "bg-green-500/10" },
-]
+  {
+    id: "like",
+    icon: Heart,
+    label: "Love",
+    color: "text-red-500",
+    bg: "bg-red-500/10",
+  },
+  {
+    id: "insightful",
+    icon: Lightbulb,
+    label: "Insightful",
+    color: "text-amber-500",
+    bg: "bg-amber-500/10",
+  },
+  {
+    id: "mindblown",
+    icon: Zap,
+    label: "Mind Blown",
+    color: "text-purple-500",
+    bg: "bg-purple-500/10",
+  },
+  {
+    id: "helpful",
+    icon: ThumbsUp,
+    label: "Helpful",
+    color: "text-green-500",
+    bg: "bg-green-500/10",
+  },
+];
 
 export function BlogDetails({ post }: BlogDetailsProps) {
-  const [scrollProgress, setScrollProgress] = useState(0)
-  const [showScrollTop, setShowScrollTop] = useState(false)
-  const [activeReaction, setActiveReaction] = useState<string | null>(null)
-  const [isBookmarked, setIsBookmarked] = useState(false)
-  const [copiedCode, setCopiedCode] = useState<string | null>(null)
-  const [activeSection, setActiveSection] = useState("")
-  const [showToc, setShowToc] = useState(false)
-  const [timeRemaining, setTimeRemaining] = useState("")
-  const contentRef = useRef<HTMLDivElement>(null)
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [activeReaction, setActiveReaction] = useState<string | null>(null);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState("");
+  const [showToc, setShowToc] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState("");
+  const contentRef = useRef<HTMLDivElement>(null);
 
-  const relatedPosts = getRelatedPosts(post.slug, post.category)
+  const relatedPosts = getRelatedPosts(post.slug, post.category);
 
   const tableOfContents = post.content
     .split("\n")
@@ -57,93 +81,113 @@ export function BlogDetails({ post }: BlogDetailsProps) {
     .map((line) => ({
       id: line.slice(3).toLowerCase().replace(/\s+/g, "-"),
       title: line.slice(3),
-    }))
+    }));
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight
-      const progress = (window.scrollY / scrollHeight) * 100
-      setScrollProgress(progress)
-      setShowScrollTop(window.scrollY > 500)
+      const scrollHeight =
+        document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (window.scrollY / scrollHeight) * 100;
+      setScrollProgress(progress);
+      setShowScrollTop(window.scrollY > 500);
 
       // Calculate time remaining
-      const wordsPerMinute = 200
-      const words = post.content.split(/\s+/).length
-      const totalMinutes = words / wordsPerMinute
-      const minutesRead = (progress / 100) * totalMinutes
-      const remaining = Math.max(0, Math.ceil(totalMinutes - minutesRead))
-      setTimeRemaining(remaining > 0 ? `${remaining} min left` : "Done!")
+      const wordsPerMinute = 200;
+      const words = post.content.split(/\s+/).length;
+      const totalMinutes = words / wordsPerMinute;
+      const minutesRead = (progress / 100) * totalMinutes;
+      const remaining = Math.max(0, Math.ceil(totalMinutes - minutesRead));
+      setTimeRemaining(remaining > 0 ? `${remaining} min left` : "Done!");
 
       // Track active section
-      const sections = document.querySelectorAll("h2[id]")
+      const sections = document.querySelectorAll("h2[id]");
       sections.forEach((section) => {
-        const rect = section.getBoundingClientRect()
+        const rect = section.getBoundingClientRect();
         if (rect.top <= 150 && rect.bottom >= 0) {
-          setActiveSection(section.id)
+          setActiveSection(section.id);
         }
-      })
-    }
+      });
+    };
 
-    window.addEventListener("scroll", handleScroll)
-    handleScroll()
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [post.content])
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [post.content]);
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" })
-  }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const scrollToSection = (id: string) => {
-    const element = document.getElementById(id)
+    const element = document.getElementById(id);
     if (element) {
-      const offset = 100
-      const top = element.getBoundingClientRect().top + window.scrollY - offset
-      window.scrollTo({ top, behavior: "smooth" })
-      setShowToc(false)
+      const offset = 100;
+      const top = element.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top, behavior: "smooth" });
+      setShowToc(false);
     }
-  }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "long",
       day: "numeric",
       year: "numeric",
-    })
-  }
+    });
+  };
 
   const copyCodeToClipboard = (code: string, id: string) => {
-    navigator.clipboard.writeText(code)
-    setCopiedCode(id)
-    setTimeout(() => setCopiedCode(null), 2000)
-  }
+    navigator.clipboard.writeText(code);
+    setCopiedCode(id);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
 
-  const categoryColors: Record<string, { gradient: string; bg: string; text: string }> = {
-    Development: { gradient: "from-cyan-400 to-blue-500", bg: "bg-cyan-500/10", text: "text-cyan-400" },
-    Design: { gradient: "from-pink-400 to-rose-500", bg: "bg-pink-500/10", text: "text-pink-400" },
-    Trends: { gradient: "from-amber-400 to-orange-500", bg: "bg-amber-500/10", text: "text-amber-400" },
-  }
+  const categoryColors: Record<
+    string,
+    { gradient: string; bg: string; text: string }
+  > = {
+    Development: {
+      gradient: "from-cyan-400 to-blue-500",
+      bg: "bg-cyan-500/10",
+      text: "text-cyan-400",
+    },
+    Design: {
+      gradient: "from-pink-400 to-rose-500",
+      bg: "bg-pink-500/10",
+      text: "text-pink-400",
+    },
+    Trends: {
+      gradient: "from-amber-400 to-orange-500",
+      bg: "bg-amber-500/10",
+      text: "text-amber-400",
+    },
+  };
 
-  const categoryStyle = categoryColors[post.category] || categoryColors.Development
+  const categoryStyle =
+    categoryColors[post.category] || categoryColors.Development;
 
   const renderContent = (content: string) => {
-    const lines = content.trim().split("\n")
-    const elements: React.ReactNode[] = []
-    let inCodeBlock = false
-    let codeContent = ""
-    let codeLanguage = ""
-    let codeBlockId = 0
+    const lines = content.trim().split("\n");
+    const elements: React.ReactNode[] = [];
+    let inCodeBlock = false;
+    let codeContent = "";
+    let codeLanguage = "";
+    let codeBlockId = 0;
 
     lines.forEach((line, i) => {
       if (line.startsWith("```")) {
         if (!inCodeBlock) {
-          inCodeBlock = true
-          codeLanguage = line.slice(3).trim()
-          codeContent = ""
+          inCodeBlock = true;
+          codeLanguage = line.slice(3).trim();
+          codeContent = "";
         } else {
-          const currentCodeId = `code-${codeBlockId++}`
-          const currentCode = codeContent.trim()
+          const currentCodeId = `code-${codeBlockId++}`;
+          const currentCode = codeContent.trim();
           elements.push(
-            <div key={i} className="my-8 rounded-2xl overflow-hidden border border-border group">
+            <div
+              key={i}
+              className="my-8 rounded-2xl overflow-hidden border border-border group"
+            >
               <div className="flex items-center justify-between px-4 py-3 bg-muted/50 border-b border-border">
                 <div className="flex items-center gap-3">
                   <div className="flex gap-1.5">
@@ -156,7 +200,9 @@ export function BlogDetails({ post }: BlogDetailsProps) {
                   </span>
                 </div>
                 <button
-                  onClick={() => copyCodeToClipboard(currentCode, currentCodeId)}
+                  onClick={() =>
+                    copyCodeToClipboard(currentCode, currentCodeId)
+                  }
                   className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted"
                 >
                   {copiedCode === currentCodeId ? (
@@ -173,37 +219,44 @@ export function BlogDetails({ post }: BlogDetailsProps) {
                 </button>
               </div>
               <pre className="p-5 bg-card overflow-x-auto">
-                <code className="text-sm font-mono text-foreground leading-relaxed">{currentCode}</code>
+                <code className="text-sm font-mono text-foreground leading-relaxed">
+                  {currentCode}
+                </code>
               </pre>
             </div>,
-          )
-          inCodeBlock = false
-          codeContent = ""
+          );
+          inCodeBlock = false;
+          codeContent = "";
         }
-        return
+        return;
       }
 
       if (inCodeBlock) {
-        codeContent += line + "\n"
-        return
+        codeContent += line + "\n";
+        return;
       }
 
       // Headers with IDs for TOC
       if (line.startsWith("## ")) {
-        const title = line.slice(3)
-        const id = title.toLowerCase().replace(/\s+/g, "-")
+        const title = line.slice(3);
+        const id = title.toLowerCase().replace(/\s+/g, "-");
         elements.push(
           <h2
             key={i}
             id={id}
             className="text-2xl sm:text-3xl font-bold text-foreground mt-16 mb-6 scroll-mt-24 opacity-0 animate-fade-up flex items-center gap-3 group"
-            style={{ animationDelay: `${i * 20}ms`, animationFillMode: "forwards" }}
+            style={{
+              animationDelay: `${i * 20}ms`,
+              animationFillMode: "forwards",
+            }}
           >
-            <span className={`w-1.5 h-8 rounded-full bg-gradient-to-b ${categoryStyle.gradient}`} />
+            <span
+              className={`w-1.5 h-8 rounded-full bg-gradient-to-b ${categoryStyle.gradient}`}
+            />
             {title}
           </h2>,
-        )
-        return
+        );
+        return;
       }
 
       // Numbered lists
@@ -212,17 +265,22 @@ export function BlogDetails({ post }: BlogDetailsProps) {
           <div
             key={i}
             className="flex gap-4 my-3 opacity-0 animate-fade-up"
-            style={{ animationDelay: `${i * 20}ms`, animationFillMode: "forwards" }}
+            style={{
+              animationDelay: `${i * 20}ms`,
+              animationFillMode: "forwards",
+            }}
           >
             <span
               className={`flex-shrink-0 w-8 h-8 rounded-xl bg-gradient-to-br ${categoryStyle.gradient} text-white text-sm font-bold flex items-center justify-center shadow-lg`}
             >
               {line.match(/^\d+/)?.[0]}
             </span>
-            <p className="text-muted-foreground leading-relaxed pt-1">{line.replace(/^\d+\.\s/, "")}</p>
+            <p className="text-muted-foreground leading-relaxed pt-1">
+              {line.replace(/^\d+\.\s/, "")}
+            </p>
           </div>,
-        )
-        return
+        );
+        return;
       }
 
       // Bullet lists
@@ -231,20 +289,28 @@ export function BlogDetails({ post }: BlogDetailsProps) {
           <div
             key={i}
             className="flex gap-4 my-3 opacity-0 animate-fade-up"
-            style={{ animationDelay: `${i * 20}ms`, animationFillMode: "forwards" }}
+            style={{
+              animationDelay: `${i * 20}ms`,
+              animationFillMode: "forwards",
+            }}
           >
-            <span className={`flex-shrink-0 w-2 h-2 rounded-full bg-gradient-to-br ${categoryStyle.gradient} mt-2.5`} />
+            <span
+              className={`flex-shrink-0 w-2 h-2 rounded-full bg-gradient-to-br ${categoryStyle.gradient} mt-2.5`}
+            />
             <p
               className="text-muted-foreground leading-relaxed"
               dangerouslySetInnerHTML={{
                 __html: line
                   .slice(2)
-                  .replace(/\*\*(.*?)\*\*/g, "<strong class='text-foreground font-semibold'>$1</strong>"),
+                  .replace(
+                    /\*\*(.*?)\*\*/g,
+                    "<strong class='text-foreground font-semibold'>$1</strong>",
+                  ),
               }}
             />
           </div>,
-        )
-        return
+        );
+        return;
       }
 
       // Regular paragraphs
@@ -253,17 +319,23 @@ export function BlogDetails({ post }: BlogDetailsProps) {
           <p
             key={i}
             className="text-muted-foreground leading-relaxed my-5 text-lg opacity-0 animate-fade-up"
-            style={{ animationDelay: `${i * 20}ms`, animationFillMode: "forwards" }}
+            style={{
+              animationDelay: `${i * 20}ms`,
+              animationFillMode: "forwards",
+            }}
             dangerouslySetInnerHTML={{
-              __html: line.replace(/\*\*(.*?)\*\*/g, "<strong class='text-foreground font-semibold'>$1</strong>"),
+              __html: line.replace(
+                /\*\*(.*?)\*\*/g,
+                "<strong class='text-foreground font-semibold'>$1</strong>",
+              ),
             }}
           />,
-        )
+        );
       }
-    })
+    });
 
-    return elements
-  }
+    return elements;
+  };
 
   return (
     <div className="relative min-h-screen bg-background">
@@ -366,7 +438,10 @@ export function BlogDetails({ post }: BlogDetailsProps) {
               <div className="flex items-center gap-4">
                 <div className="relative">
                   <Image
-                    src={post.author.avatar || "/placeholder.svg"}
+                    src={
+                      post.author.avatar ||
+                      "https://raw.githubusercontent.com/amirhamja4bd/public_images/refs/heads/main/Amir_Hamza.png"
+                    }
                     alt={post.author.name}
                     width={56}
                     height={56}
@@ -377,8 +452,12 @@ export function BlogDetails({ post }: BlogDetailsProps) {
                   </div>
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground text-lg">{post.author.name}</p>
-                  <p className="text-sm text-muted-foreground">{post.author.role}</p>
+                  <p className="font-semibold text-foreground text-lg">
+                    {post.author.name}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {post.author.role}
+                  </p>
                 </div>
               </div>
 
@@ -396,7 +475,9 @@ export function BlogDetails({ post }: BlogDetailsProps) {
                       : "bg-muted text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  <Bookmark className={`w-5 h-5 ${isBookmarked ? "fill-current" : ""}`} />
+                  <Bookmark
+                    className={`w-5 h-5 ${isBookmarked ? "fill-current" : ""}`}
+                  />
                 </button>
                 <button className="p-2.5 rounded-xl bg-muted text-muted-foreground hover:text-foreground transition-colors">
                   <Share2 className="w-5 h-5" />
@@ -408,33 +489,53 @@ export function BlogDetails({ post }: BlogDetailsProps) {
 
         <div className="relative max-w-5xl mx-auto px-4 mb-16">
           <div className="relative aspect-[2/1] rounded-3xl overflow-hidden opacity-0 animate-scale-in delay-400 shadow-2xl">
-            <Image src={post.thumbnail || "/placeholder.svg"} alt={post.title} fill className="object-cover" priority />
-            <div className={`absolute inset-0 bg-gradient-to-t from-background/30 to-transparent`} />
+            <Image
+              src={post.thumbnail || "/placeholder.svg"}
+              alt={post.title}
+              fill
+              className="object-cover"
+              priority
+            />
+            <div
+              className={`absolute inset-0 bg-gradient-to-t from-background/30 to-transparent`}
+            />
           </div>
         </div>
 
         <div ref={contentRef} className="max-w-3xl mx-auto px-4 pb-16">
-          <div className="prose prose-lg dark:prose-invert max-w-none">{renderContent(post.content)}</div>
+          <div className="prose prose-lg dark:prose-invert max-w-none">
+            {renderContent(post.content)}
+          </div>
 
           <div className="mt-16 pt-8 border-t border-border">
-            <p className="text-sm text-muted-foreground mb-4 text-center">How did you find this article?</p>
+            <p className="text-sm text-muted-foreground mb-4 text-center">
+              How did you find this article?
+            </p>
             <div className="flex items-center justify-center gap-3">
               {reactions.map((reaction) => {
-                const Icon = reaction.icon
+                const Icon = reaction.icon;
                 return (
                   <button
                     key={reaction.id}
-                    onClick={() => setActiveReaction(activeReaction === reaction.id ? null : reaction.id)}
+                    onClick={() =>
+                      setActiveReaction(
+                        activeReaction === reaction.id ? null : reaction.id,
+                      )
+                    }
                     className={`flex flex-col items-center gap-1.5 p-4 rounded-2xl transition-all ${
                       activeReaction === reaction.id
                         ? `${reaction.bg} ${reaction.color} scale-110`
                         : "bg-card border border-border text-muted-foreground hover:border-primary/30"
                     }`}
                   >
-                    <Icon className={`w-6 h-6 ${activeReaction === reaction.id ? "fill-current" : ""}`} />
-                    <span className="text-xs font-medium">{reaction.label}</span>
+                    <Icon
+                      className={`w-6 h-6 ${activeReaction === reaction.id ? "fill-current" : ""}`}
+                    />
+                    <span className="text-xs font-medium">
+                      {reaction.label}
+                    </span>
                   </button>
-                )
+                );
               })}
             </div>
           </div>
@@ -452,8 +553,12 @@ export function BlogDetails({ post }: BlogDetailsProps) {
           </div>
 
           <div className="mt-12 p-8 rounded-3xl bg-gradient-to-br from-card to-muted/30 border border-border">
-            <h3 className="font-bold text-foreground text-lg mb-2">Enjoyed this article?</h3>
-            <p className="text-muted-foreground mb-6">Share it with your network and help others discover it too.</p>
+            <h3 className="font-bold text-foreground text-lg mb-2">
+              Enjoyed this article?
+            </h3>
+            <p className="text-muted-foreground mb-6">
+              Share it with your network and help others discover it too.
+            </p>
             <div className="flex flex-wrap items-center gap-3">
               <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#1DA1F2] text-white hover:opacity-90 transition-opacity">
                 <Twitter className="w-4 h-4" />
@@ -476,19 +581,30 @@ export function BlogDetails({ post }: BlogDetailsProps) {
             />
             <div className="relative flex flex-col sm:flex-row gap-6 items-center sm:items-start text-center sm:text-left">
               <Image
-                src={post.author.avatar || "/placeholder.svg"}
+                src={
+                  post.author.avatar ||
+                  "https://raw.githubusercontent.com/amirhamja4bd/public_images/refs/heads/main/Amir_Hamza.png"
+                }
                 alt={post.author.name}
                 width={96}
                 height={96}
                 className="rounded-3xl ring-4 ring-border"
               />
               <div className="flex-1">
-                <p className={`text-sm font-semibold ${categoryStyle.text} mb-1`}>About the Author</p>
-                <h3 className="text-2xl font-bold text-foreground mb-2">{post.author.name}</h3>
+                <p
+                  className={`text-sm font-semibold ${categoryStyle.text} mb-1`}
+                >
+                  About the Author
+                </p>
+                <h3 className="text-2xl font-bold text-foreground mb-2">
+                  {post.author.name}
+                </h3>
                 <p className="text-muted-foreground mb-4">{post.author.role}</p>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                  Passionate about building great products and sharing knowledge with the developer community. Always
-                  exploring new technologies and best practices to create better user experiences.
+                  Passionate about building great products and sharing knowledge
+                  with the developer community. Always exploring new
+                  technologies and best practices to create better user
+                  experiences.
                 </p>
                 <div className="flex items-center gap-3 justify-center sm:justify-start">
                   <button
@@ -516,8 +632,12 @@ export function BlogDetails({ post }: BlogDetailsProps) {
                     <Sparkles className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-foreground">Continue Reading</h2>
-                    <p className="text-sm text-muted-foreground">More articles you might enjoy</p>
+                    <h2 className="text-2xl font-bold text-foreground">
+                      Continue Reading
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      More articles you might enjoy
+                    </p>
                   </div>
                 </div>
                 <Link
@@ -530,10 +650,17 @@ export function BlogDetails({ post }: BlogDetailsProps) {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {relatedPosts.map((relatedPost, index) => (
-                  <Link key={relatedPost.id} href={`/blog/${relatedPost.slug}`} className="group block">
+                  <Link
+                    key={relatedPost.id}
+                    href={`/blog/${relatedPost.slug}`}
+                    className="group block"
+                  >
                     <article
                       className="relative h-full rounded-2xl overflow-hidden bg-card border border-border hover:border-primary/30 transition-all duration-300 opacity-0 animate-fade-up"
-                      style={{ animationDelay: `${index * 100}ms`, animationFillMode: "forwards" }}
+                      style={{
+                        animationDelay: `${index * 100}ms`,
+                        animationFillMode: "forwards",
+                      }}
                     >
                       <div className="relative h-48 overflow-hidden">
                         <Image
@@ -553,7 +680,9 @@ export function BlogDetails({ post }: BlogDetailsProps) {
                         <h3 className="font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">
                           {relatedPost.title}
                         </h3>
-                        <p className="text-sm text-muted-foreground line-clamp-2">{relatedPost.excerpt}</p>
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {relatedPost.excerpt}
+                        </p>
                       </div>
                     </article>
                   </Link>
@@ -568,11 +697,13 @@ export function BlogDetails({ post }: BlogDetailsProps) {
       <button
         onClick={scrollToTop}
         className={`fixed bottom-8 right-8 p-4 rounded-2xl bg-gradient-to-br ${categoryStyle.gradient} text-white shadow-lg transition-all duration-300 z-50 ${
-          showScrollTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
+          showScrollTop
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-4 pointer-events-none"
         }`}
       >
         <ChevronUp className="w-5 h-5" />
       </button>
     </div>
-  )
+  );
 }

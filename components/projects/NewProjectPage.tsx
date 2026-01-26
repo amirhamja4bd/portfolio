@@ -149,7 +149,7 @@ export function ProjectsSection() {
                     "px-4 py-2 text-sm rounded-full transition-all duration-300",
                     activeCategory === category
                       ? "bg-foreground text-background shadow-lg"
-                      : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground",
                   )}
                 >
                   {category}
@@ -166,7 +166,7 @@ export function ProjectsSection() {
                 "p-2 rounded-md transition-colors",
                 viewMode === "grid"
                   ? "bg-background shadow-sm"
-                  : "hover:bg-background/50"
+                  : "hover:bg-background/50",
               )}
             >
               <LayoutGrid className="h-4 w-4" />
@@ -177,7 +177,7 @@ export function ProjectsSection() {
                 "p-2 rounded-md transition-colors",
                 viewMode === "list"
                   ? "bg-background shadow-sm"
-                  : "hover:bg-background/50"
+                  : "hover:bg-background/50",
               )}
             >
               <List className="h-4 w-4" />
@@ -206,7 +206,7 @@ export function ProjectsSection() {
               "grid gap-6",
               viewMode === "grid"
                 ? "sm:grid-cols-2 lg:grid-cols-3"
-                : "grid-cols-1"
+                : "grid-cols-1",
             )}
           >
             {regularProjects.map((project: any, index: any) => (
@@ -286,12 +286,6 @@ export function ProjectsSection() {
               >
                 Start a Conversation
                 <ArrowUpRight className="h-5 w-5" />
-              </a>
-              <a
-                href="#"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border-2 border-border text-foreground font-medium hover:bg-muted transition-colors"
-              >
-                View Resume
               </a>
             </div>
           </div>

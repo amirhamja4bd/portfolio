@@ -4,7 +4,6 @@ import { blogApi } from "@/lib/api-client";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
-  ArrowRight,
   BookOpen,
   ChevronLeft,
   ChevronRight,
@@ -13,7 +12,6 @@ import {
   Grid3X3,
   Layers,
   List,
-  Mail,
   Search,
   Sparkles,
   TrendingUp,
@@ -21,6 +19,8 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { BlogCard } from "@/components/blogs/blog-card";
+import { BlogSubscription } from "@/components/blogs/blog-subscription";
+
 import BlogListSkeleton from "@/components/skeleton/BlogListSkeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -411,7 +411,7 @@ export default function BlogsPage() {
                         key={tag}
                         onClick={() => {
                           setSelectedTags((prev) =>
-                            prev.includes(tag) ? [] : [tag]
+                            prev.includes(tag) ? [] : [tag],
                           );
                           resetPage();
                         }}
@@ -550,30 +550,7 @@ export default function BlogsPage() {
             {/* Sidebar */}
             <aside className="col-span-12 lg:col-span-4 space-y-6">
               <div className="sticky top-24">
-                <div className="relative rounded-3xl overflow-hidden mb-6">
-                  <div className="absolute inset-0 bg-linear-to-br from-primary via-brandColor to-accent" />
-                  <div className="relative p-8 text-white">
-                    <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-6">
-                      <Mail className="w-7 h-7" />
-                    </div>
-                    <h3 className="text-2xl font-bold mb-3">
-                      Stay in the loop
-                    </h3>
-                    <p className="text-white/80 mb-6 text-sm leading-relaxed">
-                      Get the latest articles, tutorials, and insights delivered
-                      straight to your inbox.
-                    </p>
-                    <div className="space-y-3">
-                      <Input
-                        placeholder="Enter your email"
-                        className="bg-white/20 border-white/20 text-white placeholder:text-white/60"
-                      />
-                      <Button className="w-full bg-white text-primary hover:bg-white/90">
-                        Subscribe <ArrowRight className="ml-2 w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+                <BlogSubscription />
 
                 <div className="p-6 rounded-2xl bg-card border border-border">
                   <div className="flex items-center gap-2 mb-4">
